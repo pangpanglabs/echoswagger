@@ -20,7 +20,23 @@ Notice:
 4.只支持基本类型的Map Key
 */
 
+type ApiRouter interface {
+	// GET overrides `Echo#GET()` for sub-routes within the ApiGroup.
+	GET(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api
+
+	// POST overrides `Echo#POST()` for sub-routes within the ApiGroup.
+	POST(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api
+
+	// PUT overrides `Echo#PUT()` for sub-routes within the ApiGroup.
+	PUT(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api
+
+	// DELETE overrides `Echo#DELETE()` for sub-routes within the ApiGroup.
+	DELETE(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api
+}
+
 type ApiRoot interface {
+	ApiRouter
+
 	// ApiGroup creates ApiGroup. Use this instead of Echo#ApiGroup.
 	Group(name, prefix string, m ...echo.MiddlewareFunc) ApiGroup
 
@@ -53,17 +69,7 @@ type ApiRoot interface {
 }
 
 type ApiGroup interface {
-	// GET overrides `Echo#GET()` for sub-routes within the ApiGroup.
-	GET(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api
-
-	// POST overrides `Echo#POST()` for sub-routes within the ApiGroup.
-	POST(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api
-
-	// PUT overrides `Echo#PUT()` for sub-routes within the ApiGroup.
-	PUT(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api
-
-	// DELETE overrides `Echo#DELETE()` for sub-routes within the ApiGroup.
-	DELETE(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api
+	ApiRouter
 
 	// SetDescription sets description for ApiGroup.
 	SetDescription(desc string) ApiGroup
@@ -218,6 +224,22 @@ func New(e *echo.Echo, basePath, docPath string, i *Info) ApiRoot {
 	e.GET(docPath, r.docHandler(specPath))
 	e.GET(specPath, r.Spec)
 	return r
+}
+
+func (r *Root) GET(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
+	return r.appendRoute(echo.GET, r.echo.GET(path, h, m...))
+}
+
+func (r *Root) POST(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
+	return r.appendRoute(echo.POST, r.echo.POST(path, h, m...))
+}
+
+func (r *Root) PUT(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
+	return r.appendRoute(echo.PUT, r.echo.PUT(path, h, m...))
+}
+
+func (r *Root) DELETE(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
+	return r.appendRoute(echo.DELETE, r.echo.DELETE(path, h, m...))
 }
 
 func (r *Root) Group(name, prefix string, m ...echo.MiddlewareFunc) ApiGroup {
