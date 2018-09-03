@@ -37,7 +37,7 @@ func isValidParam(t reflect.Type, nest, inner bool) bool {
 	case reflect.Ptr:
 		return isValidParam(t.Elem(), nest, inner)
 	case reflect.Struct:
-		if t == reflect.TypeOf(time.Time{}) {
+		if t == reflect.TypeOf(time.Time{}) && (!nest || nest && inner) {
 			return true
 		} else if !inner {
 			for i := 0; i < t.NumField(); i++ {

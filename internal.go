@@ -37,11 +37,18 @@ func (r *Root) docHandler(swaggerPath string) echo.HandlerFunc {
 		panic(err)
 	}
 
+	cdn := DefaultCDN
+	if r.ui.CDN != "" {
+		cdn = r.ui.CDN
+	}
+
 	return func(c echo.Context) error {
 		buf := new(bytes.Buffer)
 		t.Execute(buf, map[string]interface{}{
-			"title": r.spec.Info.Title,
-			"url":   c.Scheme() + "://" + c.Request().Host + swaggerPath,
+			"title":   r.spec.Info.Title,
+			"url":     c.Scheme() + "://" + c.Request().Host + swaggerPath,
+			"hideTop": r.ui.HideTop,
+			"cdn":     cdn,
 		})
 		return c.HTMLBlob(http.StatusOK, buf.Bytes())
 	}
@@ -62,14 +69,13 @@ func (r *RawDefineDic) getKey(v reflect.Value) (bool, string) {
 	return false, name
 }
 
-func (r *routers) appendRoute(method string, route *echo.Route) *api {
+func (r *routers) appendRoute(route *echo.Route) *api {
 	opr := Operation{
 		Responses: make(map[string]*Response),
 	}
 	a := api{
 		route:     route,
 		defs:      r.defs,
-		method:    method,
 		operation: opr,
 	}
 	r.apis = append(r.apis, a)

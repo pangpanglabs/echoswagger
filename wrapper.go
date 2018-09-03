@@ -21,23 +21,32 @@ Notice:
 */
 
 type ApiRouter interface {
-	// GET overrides `Echo#GET()` for sub-routes within the ApiGroup.
+	// GET overrides `Echo#GET()` and creates Api.
 	GET(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api
 
-	// POST overrides `Echo#POST()` for sub-routes within the ApiGroup.
+	// POST overrides `Echo#POST()` and creates Api.
 	POST(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api
 
-	// PUT overrides `Echo#PUT()` for sub-routes within the ApiGroup.
+	// PUT overrides `Echo#PUT()` and creates Api.
 	PUT(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api
 
-	// DELETE overrides `Echo#DELETE()` for sub-routes within the ApiGroup.
+	// DELETE overrides `Echo#DELETE()` and creates Api.
 	DELETE(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api
+
+	// OPTIONS overrides `Echo#OPTIONS()` and creates Api.
+	OPTIONS(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api
+
+	// HEAD overrides `Echo#HEAD()` and creates Api.
+	HEAD(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api
+
+	// PATCH overrides `Echo#PATCH()` and creates Api.
+	PATCH(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api
 }
 
 type ApiRoot interface {
 	ApiRouter
 
-	// ApiGroup creates ApiGroup. Use this instead of Echo#ApiGroup.
+	// Group overrides `Echo#Group()` and creates ApiGroup.
 	Group(name, prefix string, m ...echo.MiddlewareFunc) ApiGroup
 
 	// SetRequestContentType sets request content types.
@@ -58,13 +67,16 @@ type ApiRoot interface {
 	// AddSecurityOAuth2 adds `SecurityDefinition` with type oauth2.
 	AddSecurityOAuth2(name, desc string, flow OAuth2FlowType, authorizationUrl, tokenUrl string, scopes map[string]string) ApiRoot
 
+	// SetUI sets UI setting.
+	SetUI(ui UISetting) ApiRoot
+
 	// GetRaw returns raw `Swagger`. Only special case should use.
 	GetRaw() *Swagger
 
 	// SetRaw sets raw `Swagger` to ApiRoot. Only special case should use.
 	SetRaw(s *Swagger) ApiRoot
 
-	// Echo returns the embeded echo instance
+	// Echo returns the embedded Echo instance
 	Echo() *echo.Echo
 }
 
@@ -78,16 +90,16 @@ type ApiGroup interface {
 	SetExternalDocs(desc, url string) ApiGroup
 
 	// SetSecurity sets Security for all operations within the ApiGroup
-	// which names are reigisters by AddSecurity... functions.
+	// which names are reigistered by AddSecurity... functions.
 	SetSecurity(names ...string) ApiGroup
 
-	// SetSecurity sets Security with scopes for all operations
-	// within the ApiGroup which names are reigisters
+	// SetSecurityWithScope sets Security with scopes for all operations
+	// within the ApiGroup which names are reigistered
 	// by AddSecurity... functions.
 	// Should only use when Security type is oauth2.
 	SetSecurityWithScope(s map[string][]string) ApiGroup
 
-	// EchoGroup returns `*echo.Group` within the ApiGroup.
+	// EchoGroup returns the embedded `echo.Group` instance.
 	EchoGroup() *echo.Group
 }
 
@@ -96,36 +108,41 @@ type Api interface {
 	AddParamPath(p interface{}, name, desc string) Api
 
 	// AddParamPathNested adds path parameters nested in p.
+	// P must be struct type.
 	AddParamPathNested(p interface{}) Api
 
 	// AddParamQuery adds query parameter.
 	AddParamQuery(p interface{}, name, desc string, required bool) Api
 
 	// AddParamQueryNested adds query parameters nested in p.
+	// P must be struct type.
 	AddParamQueryNested(p interface{}) Api
 
 	// AddParamForm adds formData parameter.
 	AddParamForm(p interface{}, name, desc string, required bool) Api
 
 	// AddParamFormNested adds formData parameters nested in p.
+	// P must be struct type.
 	AddParamFormNested(p interface{}) Api
 
 	// AddParamHeader adds header parameter.
 	AddParamHeader(p interface{}, name, desc string, required bool) Api
 
 	// AddParamHeaderNested adds header parameters nested in p.
+	// P must be struct type.
 	AddParamHeaderNested(p interface{}) Api
 
 	// AddParamBody adds body parameter.
 	AddParamBody(p interface{}, name, desc string, required bool) Api
 
-	// AddParamBody adds file parameter.
+	// AddParamFile adds file parameter.
 	AddParamFile(name, desc string, required bool) Api
 
 	// AddResponse adds response for Api.
+	// Header must be struct type.
 	AddResponse(code int, desc string, schema interface{}, header interface{}) Api
 
-	// SetResponseContentType sets request content types.
+	// SetRequestContentType sets request content types.
 	SetRequestContentType(types ...string) Api
 
 	// SetResponseContentType sets response content types.
@@ -134,7 +151,7 @@ type Api interface {
 	// SetOperationId sets operationId
 	SetOperationId(id string) Api
 
-	// SetDescription marks Api as deprecated.
+	// SetDeprecated marks Api as deprecated.
 	SetDeprecated() Api
 
 	// SetDescription sets description.
@@ -143,19 +160,20 @@ type Api interface {
 	// SetExternalDocs sets external docs.
 	SetExternalDocs(desc, url string) Api
 
-	// SetExternalDocs sets summary.
+	// SetSummary sets summary.
 	SetSummary(summary string) Api
 
-	// SetSecurity sets Security which names are reigisters
+	// SetSecurity sets Security which names are reigistered
 	// by AddSecurity... functions.
 	SetSecurity(names ...string) Api
 
-	// SetSecurity sets Security for Api which names are
-	// reigisters by AddSecurity... functions.
+	// SetSecurityWithScope sets Security for Api which names are
+	// reigistered by AddSecurity... functions.
 	// Should only use when Security type is oauth2.
 	SetSecurityWithScope(s map[string][]string) Api
 
-	// TODO return echo.Router
+	// Route returns the embedded `echo.Route` instance.
+	Route() *echo.Route
 }
 
 type routers struct {
@@ -168,6 +186,7 @@ type Root struct {
 	spec   *Swagger
 	echo   *echo.Echo
 	groups []group
+	ui     UISetting
 	once   sync.Once
 	err    error
 }
@@ -183,7 +202,6 @@ type api struct {
 	route     *echo.Route
 	defs      *RawDefineDic
 	security  []map[string][]string
-	method    string
 	operation Operation
 }
 
@@ -227,24 +245,36 @@ func New(e *echo.Echo, basePath, docPath string, i *Info) ApiRoot {
 }
 
 func (r *Root) GET(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
-	return r.appendRoute(echo.GET, r.echo.GET(path, h, m...))
+	return r.appendRoute(r.echo.GET(path, h, m...))
 }
 
 func (r *Root) POST(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
-	return r.appendRoute(echo.POST, r.echo.POST(path, h, m...))
+	return r.appendRoute(r.echo.POST(path, h, m...))
 }
 
 func (r *Root) PUT(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
-	return r.appendRoute(echo.PUT, r.echo.PUT(path, h, m...))
+	return r.appendRoute(r.echo.PUT(path, h, m...))
 }
 
 func (r *Root) DELETE(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
-	return r.appendRoute(echo.DELETE, r.echo.DELETE(path, h, m...))
+	return r.appendRoute(r.echo.DELETE(path, h, m...))
+}
+
+func (r *Root) OPTIONS(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
+	return r.appendRoute(r.echo.OPTIONS(path, h, m...))
+}
+
+func (r *Root) HEAD(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
+	return r.appendRoute(r.echo.HEAD(path, h, m...))
+}
+
+func (r *Root) PATCH(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
+	return r.appendRoute(r.echo.PATCH(path, h, m...))
 }
 
 func (r *Root) Group(name, prefix string, m ...echo.MiddlewareFunc) ApiGroup {
 	if name == "" {
-		panic("echowagger: invalid name of ApiGroup")
+		panic("echoswagger: invalid name of ApiGroup")
 	}
 	echoGroup := r.echo.Group(prefix, m...)
 	group := group{
@@ -330,6 +360,11 @@ func (r *Root) AddSecurityOAuth2(name, desc string, flow OAuth2FlowType, authori
 	return r
 }
 
+func (r *Root) SetUI(ui UISetting) ApiRoot {
+	r.ui = ui
+	return r
+}
+
 func (r *Root) GetRaw() *Swagger {
 	return r.spec
 }
@@ -344,25 +379,43 @@ func (r *Root) Echo() *echo.Echo {
 }
 
 func (g *group) GET(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
-	a := g.appendRoute(echo.GET, g.echoGroup.GET(path, h, m...))
+	a := g.appendRoute(g.echoGroup.GET(path, h, m...))
 	a.operation.Tags = []string{g.tag.Name}
 	return a
 }
 
 func (g *group) POST(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
-	a := g.appendRoute(echo.POST, g.echoGroup.POST(path, h, m...))
+	a := g.appendRoute(g.echoGroup.POST(path, h, m...))
 	a.operation.Tags = []string{g.tag.Name}
 	return a
 }
 
 func (g *group) PUT(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
-	a := g.appendRoute(echo.PUT, g.echoGroup.PUT(path, h, m...))
+	a := g.appendRoute(g.echoGroup.PUT(path, h, m...))
 	a.operation.Tags = []string{g.tag.Name}
 	return a
 }
 
 func (g *group) DELETE(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
-	a := g.appendRoute(echo.DELETE, g.echoGroup.DELETE(path, h, m...))
+	a := g.appendRoute(g.echoGroup.DELETE(path, h, m...))
+	a.operation.Tags = []string{g.tag.Name}
+	return a
+}
+
+func (g *group) OPTIONS(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
+	a := g.appendRoute(g.echoGroup.OPTIONS(path, h, m...))
+	a.operation.Tags = []string{g.tag.Name}
+	return a
+}
+
+func (g *group) HEAD(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
+	a := g.appendRoute(g.echoGroup.HEAD(path, h, m...))
+	a.operation.Tags = []string{g.tag.Name}
+	return a
+}
+
+func (g *group) PATCH(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
+	a := g.appendRoute(g.echoGroup.PATCH(path, h, m...))
 	a.operation.Tags = []string{g.tag.Name}
 	return a
 }
@@ -445,7 +498,6 @@ func (a *api) AddParamFile(name, desc string, required bool) Api {
 	return a
 }
 
-// Notice: header must be nested in a struct.
 func (a *api) AddResponse(code int, desc string, schema interface{}, header interface{}) Api {
 	r := &Response{
 		Description: desc,
@@ -521,4 +573,8 @@ func (a *api) SetSecurity(names ...string) Api {
 func (a *api) SetSecurityWithScope(s map[string][]string) Api {
 	a.security = setSecurityWithScope(a.security, s)
 	return a
+}
+
+func (a *api) Route() *echo.Route {
+	return a.route
 }

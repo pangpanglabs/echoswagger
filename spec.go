@@ -69,10 +69,10 @@ func (r *Root) transfer(a *api) error {
 	}
 
 	if p, ok := r.spec.Paths[path]; ok {
-		p.(*Path).oprationAssign(a.method, &a.operation)
+		p.(*Path).oprationAssign(a.route.Method, &a.operation)
 	} else {
 		p := &Path{}
-		p.oprationAssign(a.method, &a.operation)
+		p.oprationAssign(a.route.Method, &a.operation)
 		r.spec.Paths[path] = p
 	}
 	return nil
@@ -86,10 +86,14 @@ func (p *Path) oprationAssign(method string, operation *Operation) {
 		p.Post = operation
 	case echo.PUT:
 		p.Put = operation
-	case echo.PATCH:
-		p.Patch = operation
 	case echo.DELETE:
 		p.Delete = operation
+	case echo.OPTIONS:
+		p.Options = operation
+	case echo.HEAD:
+		p.Head = operation
+	case echo.PATCH:
+		p.Patch = operation
 	}
 }
 
