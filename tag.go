@@ -88,7 +88,7 @@ func (p *Parameter) handleSwaggerTags(field reflect.StructField, name string, in
 		p.Required = true
 	}
 
-	convert := converter(field)
+	convert := converter(field.Type)
 	if t, ok := tags["enum"]; ok {
 		enums := strings.Split(t, "|")
 		var es []interface{}
@@ -129,9 +129,9 @@ func (p *Parameter) handleSwaggerTags(field reflect.StructField, name string, in
 	}
 }
 
-func (s *JSONSchema) handleSwaggerTags(field reflect.StructField, name string) {
+func (s *JSONSchema) handleSwaggerTags(f reflect.StructField, name string) {
 	propSchema := s.Properties[name]
-	tags := getSwaggerTags(field)
+	tags := getSwaggerTags(f)
 
 	if t, ok := tags["desc"]; ok {
 		propSchema.Description = t
@@ -163,7 +163,7 @@ func (s *JSONSchema) handleSwaggerTags(field reflect.StructField, name string) {
 		propSchema.ReadOnly = true
 	}
 
-	convert := converter(field)
+	convert := converter(f.Type)
 	if t, ok := tags["enum"]; ok {
 		enums := strings.Split(t, "|")
 		var es []interface{}
@@ -201,8 +201,8 @@ func (s *JSONSchema) handleSwaggerTags(field reflect.StructField, name string) {
 	}
 }
 
-func (h *Header) handleSwaggerTags(field reflect.StructField, name string) {
-	tags := getSwaggerTags(field)
+func (h *Header) handleSwaggerTags(f reflect.StructField, name string) {
+	tags := getSwaggerTags(f)
 
 	var collect string
 	if t, ok := tags["collect"]; ok && contains([]string{"csv", "ssv", "tsv", "pipes"}, t) {
@@ -232,7 +232,7 @@ func (h *Header) handleSwaggerTags(field reflect.StructField, name string) {
 		}
 	}
 
-	convert := converter(field)
+	convert := converter(f.Type)
 	if t, ok := tags["enum"]; ok {
 		enums := strings.Split(t, "|")
 		var es []interface{}

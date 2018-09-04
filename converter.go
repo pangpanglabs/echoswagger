@@ -64,74 +64,38 @@ func proccessPath(path string) string {
 	return path
 }
 
-// converter returns string to target type converter for a reflect.StructField
-func converter(f reflect.StructField) func(s string) (interface{}, error) {
-	switch f.Type.Kind() {
-	case reflect.Bool:
-		return func(s string) (interface{}, error) {
-			v, err := strconv.ParseBool(s)
-			return v, err
-		}
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32,
-		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uintptr:
+func converter(t reflect.Type) func(s string) (interface{}, error) {
+	st, sf := toSwaggerType(t)
+	if st == "integer" && sf == "int32" {
 		return func(s string) (interface{}, error) {
 			v, err := strconv.Atoi(s)
 			return v, err
 		}
-	case reflect.Int64, reflect.Uint64:
+	} else if st == "integer" && sf == "int64" {
 		return func(s string) (interface{}, error) {
 			v, err := strconv.ParseInt(s, 10, 64)
 			return v, err
 		}
-	case reflect.Float32:
+	} else if st == "number" && sf == "float" {
 		return func(s string) (interface{}, error) {
 			v, err := strconv.ParseFloat(s, 32)
 			return float32(v), err
 		}
-	case reflect.Float64:
+	} else if st == "number" && sf == "double" {
 		return func(s string) (interface{}, error) {
 			v, err := strconv.ParseFloat(s, 64)
 			return v, err
 		}
-	default:
+	} else if st == "boolean" && sf == "boolean" {
+		return func(s string) (interface{}, error) {
+			v, err := strconv.ParseBool(s)
+			return v, err
+		}
+	} else if st == "array" && sf == "array" {
+		return converter(t.Elem())
+	} else {
 		return func(s string) (interface{}, error) {
 			return s, nil
 		}
 	}
-}
-
-func asString(rv reflect.Value) (string, bool) {
-	switch rv.Kind() {
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		av := rv.Int()
-		if av != 0 {
-			return strconv.FormatInt(av, 10), true
-		}
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		av := rv.Uint()
-		if av != 0 {
-			return strconv.FormatUint(av, 10), true
-		}
-	case reflect.Float64:
-		av := rv.Float()
-		if av != 0 {
-			return strconv.FormatFloat(av, 'g', -1, 64), true
-		}
-	case reflect.Float32:
-		av := rv.Float()
-		if av != 0 {
-			return strconv.FormatFloat(av, 'g', -1, 32), true
-		}
-	case reflect.Bool:
-		av := rv.Bool()
-		if av {
-			return strconv.FormatBool(av), true
-		}
-	case reflect.String:
-		av := rv.String()
-		if av != "" {
-			return av, true
-		}
-	}
-	return "", false
 }

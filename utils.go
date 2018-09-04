@@ -40,29 +40,19 @@ func equals(a []string, b []string) bool {
 }
 
 func indirect(v reflect.Value) reflect.Value {
-	t := v.Type()
-	v = reflect.Indirect(v)
-	if !v.IsValid() {
-		v = reflect.New(t)
-	}
 	if v.Kind() == reflect.Ptr {
-		return indirect(v)
+		ev := v.Elem()
+		if !ev.IsValid() {
+			ev = reflect.New(v.Type().Elem())
+		}
+		return indirect(ev)
 	}
 	return v
 }
 
 func indirectValue(p interface{}) reflect.Value {
 	v := reflect.ValueOf(p)
-LoopValue:
-	v = reflect.Indirect(v)
-	if !v.IsValid() {
-		v = reflect.New(reflect.TypeOf(p))
-	}
-	if v.Kind() == reflect.Ptr {
-		goto LoopValue
-	}
-	// TODO 遍历所有子项，为Invalid初始化Value
-	return v
+	return indirect(v)
 }
 
 func indirectType(p interface{}) reflect.Type {

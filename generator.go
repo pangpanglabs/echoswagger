@@ -87,8 +87,9 @@ func (r *RawDefineDic) genSchema(v reflect.Value) *JSONSchema {
 	} else {
 		schema.Type = JSONType(st)
 		schema.Format = sf
-		if ex, ok := asString(v); ok {
-			schema.Example = ex
+		zv := reflect.Zero(v.Type())
+		if v.CanInterface() && zv.CanInterface() && v.Interface() != zv.Interface() {
+			schema.Example = v.Interface()
 		}
 	}
 	return schema
