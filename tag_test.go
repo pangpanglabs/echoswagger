@@ -81,6 +81,7 @@ func TestParamSwaggerTags(t *testing.T) {
 func TestHeaderSwaggerTags(t *testing.T) {
 	type SearchInput struct {
 		Q              string     `json:"q" swagger:"minLen(5),maxLen(8)"`
+		Enable         bool       `json:"-"`
 		BrandIds       string     `json:"brandIds" swagger:"collect(csv)"`
 		Sortby         [][]string `json:"sortby" swagger:"default(id)"`
 		Order          []int      `json:"order" swagger:"enum(0|1|n)"`
