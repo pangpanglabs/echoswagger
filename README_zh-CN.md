@@ -1,24 +1,24 @@
-English | [简体中文](./README_zh-CN.md)
+[English](./README.md) | 简体中文
 
 # Echoswagger
-Swagger UI generator for Echo framework
+[Echo](https://github.com/labstack/echo) 框架的 [Swagger UI](https://github.com/swagger-api/swagger-ui) 生成器
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/elvinchan/echoswagger)](https://goreportcard.com/report/github.com/elvinchan/echoswagger)
 [![Build Status](https://travis-ci.org/elvinchan/echoswagger.svg?branch=master)](https://travis-ci.org/elvinchan/echoswagger)
 [![codecov](https://codecov.io/gh/elvinchan/echoswagger/branch/master/graph/badge.svg)](https://codecov.io/gh/elvinchan/echoswagger)
 
-## Feature
-- No SwaggerUI HTML/CSS dependency
-- Highly integrated with Echo, low intrusive design
-- Take advantage of the strong typing language and chain programming to make it easy to use
-- Recycle garbage in time, low memory usage
+## 特性
+- 不依赖任何SwaggerUI的HTML/CSS文件
+- 与Echo高度整合，低侵入式设计
+- 利用强类型语言和链式编程的优势，简单易用
+- 及时的垃圾回收，低内存占用
 
-## Installation
+## 安装
 ```
 go get github.com/elvinchan/echoswagger
 ```
 
-## Example
+## 示例
 ```go
 package main
 
@@ -53,55 +53,55 @@ func createUser(c echo.Context) error {
 
 ```
 
-## Usage
-#### Create a `ApiRoot` with `New()`, which is a wrapper of `echo.New()`
+## 用法
+#### 用`New()`创建`ApiRoot`，此方法是对`echo.New()`方法的封装
 ```
 r := echoswagger.New(echo.New(), "/v1", "doc/", nil)
 ```
-You can use the result `ApiRoot` instance to:
-- Setup Security definitions, request/response Content-Types, UI options, etc.
+你可以用这个`ApiRoot`来：
+- 设置Security定义, 请求/响应Content-Type，UI选项，等。
 ```
 r.AddSecurityAPIKey("JWT", "JWT Token", echoswagger.SecurityInHeader).
 	SetRequestContentType("application/x-www-form-urlencoded", "multipart/form-data").
 	SetUI(UISetting{HideTop: true})
 ```
-- Get `echo.Echo` instance.
+- 获取`echo.Echo`实例。
 ```
 r.Echo()
 ```
-- Registers a new GET, POST, PUT, DELETE, OPTIONS, HEAD or PATCH route in default group, these are wrappers of Echo's create route methods.
-It returns a new `Api` instance.
+- 在默认组中注册一个GET、POST、PUT、DELETE、OPTIONS、HEAD或PATCH路由，这些是对Echo的注册路由方法的封装。
+此方法返回一个`Api`实例。
 ```
 r.GET("/:id", handler)
 ```
-- And: ↓
+- 以及： ↓
 
-#### Create a `ApiGroup` with `Group()`, which is a wrapper of `echo.Group()`
+#### 用`Group()`创建`ApiGroup`，此方法是对`echo.Group()`方法的封装
 ```
 g := r.Group("Users", "/users")
 ```
-You can use the result `ApiGroup` instance to:
-- Set description, etc.
+你可以用这个`ApiGroup`来：
+- 设置描述，等。
 ```
 g.SetDescription("The desc of group")
 ```
-- Set security for all routes in this group.
+- 为此组中的所有路由设置Security。
 ```
 g.SetSecurity("JWT")
 ```
-- Get `echo.Group` instance.
+- 获取`echo.Group`实例。
 ```
 g.EchoGroup()
 ```
-- And: ↓
+- 以及： ↓
 
-#### Registers a new route in `ApiGroup`
-GET, POST, PUT, DELETE, OPTIONS, HEAD or PATCH methods are supported by Echoswagger, these are wrappers of Echo's create route methods.
+#### 在`ApiGroup`中注册一个新的路由
+Echoswagger支持GET、POST、PUT、DELETE、OPTIONS、HEAD或PATCH方法，这些是对Echo的注册路由方法的封装。
 ```
 a := g.GET("/:id", handler)
 ```
-You can use the result `Api` instance to:
-- Add parameter with these methods:
+你可以使用此`Api`实例来：
+- 使用以下方法添加参数：
 ```
 AddParamPath(p interface{}, name, desc string)
 
@@ -124,9 +124,9 @@ AddParamBody(p interface{}, name, desc string, required bool)
 AddParamFile(name, desc string, required bool)
 ```
 
-The methods which name's suffix are `Nested` means these methods treat parameter `p` 's fields as paramters, so it must be a struct type.
+后缀带有`Nested`的方法把参数`p`的字段看做多个参数，所以它必须是结构体类型的。
 
-e.g.
+例：
 ```
 type SearchInput struct {
 	Q         string `query:"q" swagger:"desc("Keywords"),required"`
@@ -134,29 +134,29 @@ type SearchInput struct {
 }
 a.AddParamQueryNested(SearchInput{})
 ```
-Is equivalent to:
+等价于：
 ```
 a.AddParamQuery("", "q", "", true).
 	AddParamQuery(0, "skipCount", "", false)
 ```
-- Add responses.
+- 添加响应。
 ```
 a.AddResponse(http.StatusOK, "response desc", body{}, nil)
 ```
-- Set Security, request/response Content-Types, summary, description, etc.
+- 设置Security，请求/响应的Content-Type，概要，描述，等。
 ```
 a.SetSecurity("JWT").
 	SetResponseContentType("application/xml").
 	SetSummary("The summary of API").
 	SetDescription("The desc of API")
 ```
-- Get `echo.Route` instance.
+- 获取`echo.Route`实例。
 ```
 a.Route()
 ```
 
-#### With swagger tag, you can set more info with `AddParam...` methods.
-e.g.
+#### 使用swagger标签，你可以在`AddParam...`方法中设置更多信息
+例：
 ```
 type User struct {
 	Age    int       `swagger:"min(0),max(99)"`
@@ -165,7 +165,7 @@ type User struct {
 }
 a.AddParamBody(&User{}, "Body", "", true)
 ```
-The definition is equivalent to:
+此定义等价于:
 ```
 {
     "definitions": {
@@ -205,23 +205,23 @@ The definition is equivalent to:
 }
 ```
 
-**Supported swagger tags:**
+**支持的`swagger`标签：**
 
 Tag | Type | Description
 ---|:---:|---
-collect | `string` | Determines the format of the array if type array is used. Possible values are: <ul><li>`csv` - comma separated values `foo,bar`. <li>`ssv` - space separated values `foo bar`. <li>`tsv` - tab separated values `foo\tbar`. <li>`pipes` - pipe separated values `foo\|bar`. </ul> Default value is `csv`.
-desc | `string` | Description.
+collect | `string` | 如果类型是数组，确定其格式。可能的值有：<ul><li>`csv` - 逗号分隔的值 `foo,bar`。<li>`ssv` - 空格分隔的值 `foo bar`。<li>`tsv` - tab分隔的值 `foo\tbar`。<li>`pipes` - pipe分隔的值 `foo\|bar`。</ul>默认值是 `csv`。
+desc | `string` | 描述。
 maximum | `number` | -
 minimum | `number` | -
 maxLength | `integer` | -
 minLength | `integer` | -
-allowEmpty | `boolean` | Sets the ability to pass empty-valued parameters. This is valid only for either `query` or `formData` parameters and allows you to send a parameter with a name only or  an empty value. Default value is `false`.
-required | `boolean` | Determines whether this parameter is mandatory. If the parameter is `in` "path", this property is `true` without setting. Otherwise, the property MAY be included and its default value is `false`.
-readOnly | `boolean` | Relevant only for Schema `"properties"` definitions. Declares the property as "read only". This means that it MAY be sent as part of a response but MUST NOT be sent as part of the request. Properties marked as `readOnly` being `true` SHOULD NOT be in the `required` list of the defined schema. Default value is `false`.
-enum | [*] | Enumerate value, multiple values should be separated by "\|"
-default | * | Default value, which type is same as the field's type.
+allowEmpty | `boolean` | 设置传递空值参数的功能。 这仅对`query`或`formData`参数有效，并允许你发送仅具有名称或空值的参数。默认值为“false”。
+required | `boolean` | 确定此参数是否必需。如果参数是`in`“path”，则此属性默认为“true”。否则，可以设置此属性，其默认值为“false”。
+readOnly | `boolean` | 仅与Schema`"properties"`定义相关。将属性声明为“只读”。这意味着它可以作为响应的一部分发送，但绝不能作为请求的一部分发送。标记为“readOnly”的属性为“true”，不应位于已定义模式的“required”列表中。默认值为“false”。
+enum | [*] | 枚举值，多个值应以“\|”分隔。
+default | * | 默认值，该类型与字段的类型相同。
 
-## Reference
+## 参考
 [OpenAPI Specification 2.0](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md)
 
 ## License
