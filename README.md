@@ -3,9 +3,9 @@ English | [简体中文](./README_zh-CN.md)
 # Echoswagger
 Swagger UI generator for Echo framework
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/elvinchan/echoswagger)](https://goreportcard.com/report/github.com/elvinchan/echoswagger)
-[![Build Status](https://travis-ci.org/elvinchan/echoswagger.svg?branch=master)](https://travis-ci.org/elvinchan/echoswagger)
-[![codecov](https://codecov.io/gh/elvinchan/echoswagger/branch/master/graph/badge.svg)](https://codecov.io/gh/elvinchan/echoswagger)
+[![Go Report Card](https://goreportcard.com/badge/github.com/pangpanglabs/echoswagger)](https://goreportcard.com/report/github.com/pangpanglabs/echoswagger)
+[![Build Status](https://travis-ci.org/pangpanglabs/echoswagger.svg?branch=master)](https://travis-ci.org/pangpanglabs/echoswagger)
+[![codecov](https://codecov.io/gh/pangpanglabs/echoswagger/branch/master/graph/badge.svg)](https://codecov.io/gh/pangpanglabs/echoswagger)
 
 ## Feature
 - No SwaggerUI HTML/CSS dependency
@@ -15,7 +15,7 @@ Swagger UI generator for Echo framework
 
 ## Installation
 ```
-go get github.com/elvinchan/echoswagger
+go get github.com/pangpanglabs/echoswagger
 ```
 
 ## Example
@@ -25,8 +25,8 @@ package main
 import (
 	"net/http"
 
-	"github.com/elvinchan/echoswagger"
 	"github.com/labstack/echo"
+	"github.com/pangpanglabs/echoswagger"
 )
 
 func main() {
@@ -226,4 +226,4 @@ default | * | Default value, which type is same as the field's type.
 
 ## License
 
-[MIT](https://github.com/elvinchan/echoswagger/blob/master/LICENSE)
+[MIT](https://github.com/pangpanglabs/echoswagger/blob/master/LICENSE)

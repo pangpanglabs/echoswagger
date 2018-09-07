@@ -3,9 +3,9 @@
 # Echoswagger
 [Echo](https://github.com/labstack/echo) 框架的 [Swagger UI](https://github.com/swagger-api/swagger-ui) 生成器
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/elvinchan/echoswagger)](https://goreportcard.com/report/github.com/elvinchan/echoswagger)
-[![Build Status](https://travis-ci.org/elvinchan/echoswagger.svg?branch=master)](https://travis-ci.org/elvinchan/echoswagger)
-[![codecov](https://codecov.io/gh/elvinchan/echoswagger/branch/master/graph/badge.svg)](https://codecov.io/gh/elvinchan/echoswagger)
+[![Go Report Card](https://goreportcard.com/badge/github.com/pangpanglabs/echoswagger)](https://goreportcard.com/report/github.com/pangpanglabs/echoswagger)
+[![Build Status](https://travis-ci.org/pangpanglabs/echoswagger.svg?branch=master)](https://travis-ci.org/pangpanglabs/echoswagger)
+[![codecov](https://codecov.io/gh/pangpanglabs/echoswagger/branch/master/graph/badge.svg)](https://codecov.io/gh/pangpanglabs/echoswagger)
 
 ## 特性
 - 不依赖任何SwaggerUI的HTML/CSS文件
@@ -15,7 +15,7 @@
 
 ## 安装
 ```
-go get github.com/elvinchan/echoswagger
+go get github.com/pangpanglabs/echoswagger
 ```
 
 ## 示例
@@ -25,7 +25,7 @@ package main
 import (
 	"net/http"
 
-	"github.com/elvinchan/echoswagger"
+	"github.com/pangpanglabs/echoswagger"
 	"github.com/labstack/echo"
 )
 
@@ -226,4 +226,4 @@ default | * | 默认值，该类型与字段的类型相同。
 
 ## License
 
-[MIT](https://github.com/elvinchan/echoswagger/blob/master/LICENSE)
+[MIT](https://github.com/pangpanglabs/echoswagger/blob/master/LICENSE)
