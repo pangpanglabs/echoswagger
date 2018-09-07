@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/elvinchan/echoswagger"
 	"github.com/labstack/echo"
+	"github.com/pangpanglabs/echoswagger"
 )
 
 func main() {
