@@ -36,13 +36,11 @@ func (r *Root) docHandler(swaggerPath string) echo.HandlerFunc {
 	if err != nil {
 		panic(err)
 	}
-
-	cdn := DefaultCDN
-	if r.ui.CDN != "" {
-		cdn = r.ui.CDN
-	}
-
 	return func(c echo.Context) error {
+		cdn := DefaultCDN
+		if r.ui.CDN != "" {
+			cdn = r.ui.CDN
+		}
 		buf := new(bytes.Buffer)
 		t.Execute(buf, map[string]interface{}{
 			"title":   r.spec.Info.Title,

@@ -293,17 +293,18 @@ func TestAddResponse(t *testing.T) {
 
 func TestUI(t *testing.T) {
 	r := New(echo.New(), "/", "doc/", nil)
-	cdn := "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.18.1"
-	r.SetUI(UISetting{
-		HideTop: true,
-		CDN:     cdn,
-	})
 	se := r.(*Root)
 	req := httptest.NewRequest(echo.GET, "/doc/", nil)
 	rec := httptest.NewRecorder()
 	c := se.echo.NewContext(req, rec)
-
 	h := se.docHandler("/doc/swagger.json")
+
+	cdn := "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.18.0"
+	r.SetUI(UISetting{
+		HideTop: true,
+		CDN:     cdn,
+	})
+
 	if assert.NoError(t, h(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 		assert.Contains(t, rec.Body.String(), cdn)
