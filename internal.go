@@ -31,21 +31,21 @@ type RawDefine struct {
 	Schema *JSONSchema
 }
 
-func (r *Root) docHandler(swaggerPath string) echo.HandlerFunc {
+func (r *Root) docHandler(realSpecPath string) echo.HandlerFunc {
 	t, err := template.New("swagger").Parse(SwaggerUIContent)
 	if err != nil {
 		panic(err)
 	}
 	return func(c echo.Context) error {
-		cdn := DefaultCDN
-		if r.ui.CDN != "" {
-			cdn = r.ui.CDN
+		cdn := r.ui.CDN
+		if cdn == "" {
+			cdn = DefaultCDN
 		}
 		buf := new(bytes.Buffer)
 		t.Execute(buf, map[string]interface{}{
 			"title":   r.spec.Info.Title,
-			"url":     c.Scheme() + "://" + c.Request().Host + swaggerPath,
 			"hideTop": r.ui.HideTop,
+			"path":    realSpecPath,
 			"cdn":     cdn,
 		})
 		return c.HTMLBlob(http.StatusOK, buf.Bytes())

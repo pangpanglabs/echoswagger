@@ -54,14 +54,7 @@ func toSwaggerPath(path string) string {
 	for _, name := range params {
 		path = strings.Replace(path, ":"+name, "{"+name+"}", 1)
 	}
-	return proccessPath(path)
-}
-
-func proccessPath(path string) string {
-	if len(path) == 0 || path[0] != '/' {
-		path = "/" + path
-	}
-	return path
+	return connectPath(path)
 }
 
 func converter(t reflect.Type) func(s string) (interface{}, error) {

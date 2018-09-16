@@ -112,3 +112,10 @@ func isBasicType(t reflect.Type) bool {
 	}
 	return false
 }
+
+func isValidScheme(s string) bool {
+	if s == "http" || s == "https" || s == "ws" || s == "wss" {
+		return true
+	}
+	return false
+}

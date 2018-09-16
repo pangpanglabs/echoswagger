@@ -15,9 +15,8 @@ TODO:
 
 Notice:
 1.不会对Email和URL进行验证，因为不影响页面的正常显示
-2.只支持对应于SwaggerUI页面的Schema，不支持sw、sww等协议
-3.SetSecurity/SetSecurityWithScope 传多个参数表示Security之间是AND关系；多次调用SetSecurity/SetSecurityWithScope Security之间是OR关系
-4.只支持基本类型的Map Key
+2.SetSecurity/SetSecurityWithScope 传多个参数表示Security之间是AND关系；多次调用SetSecurity/SetSecurityWithScope Security之间是OR关系
+3.只支持基本类型的Map Key
 */
 
 type ApiRouter interface {
@@ -69,6 +68,9 @@ type ApiRoot interface {
 
 	// SetUI sets UI setting.
 	SetUI(ui UISetting) ApiRoot
+
+	// SetScheme sets available protocol schemes.
+	SetScheme(schemes ...string) ApiRoot
 
 	// GetRaw returns raw `Swagger`. Only special case should use.
 	GetRaw() *Swagger
@@ -211,14 +213,6 @@ func New(e *echo.Echo, basePath, docPath string, i *Info) ApiRoot {
 	if e == nil {
 		panic("echoswagger: invalid Echo instance")
 	}
-	basePath = proccessPath(basePath)
-	docPath = proccessPath(docPath)
-
-	var connector string
-	if docPath[len(docPath)-1] != '/' {
-		connector = "/"
-	}
-	specPath := docPath + connector + "swagger.json"
 
 	if i == nil {
 		i = &Info{
@@ -231,7 +225,7 @@ func New(e *echo.Echo, basePath, docPath string, i *Info) ApiRoot {
 		spec: &Swagger{
 			Info:                i,
 			SecurityDefinitions: make(map[string]*SecurityDefinition),
-			BasePath:            basePath,
+			BasePath:            connectPath(basePath),
 			Definitions:         make(map[string]*JSONSchema),
 		},
 		routers: routers{
@@ -239,7 +233,9 @@ func New(e *echo.Echo, basePath, docPath string, i *Info) ApiRoot {
 		},
 	}
 
-	e.GET(docPath, r.docHandler(specPath))
+	specPath := connectPath(docPath, "swagger.json")
+	realSpecPath := connectPath(basePath, specPath)
+	e.GET(connectPath(docPath), r.docHandler(realSpecPath))
 	e.GET(specPath, r.Spec)
 	return r
 }
@@ -362,6 +358,16 @@ func (r *Root) AddSecurityOAuth2(name, desc string, flow OAuth2FlowType, authori
 
 func (r *Root) SetUI(ui UISetting) ApiRoot {
 	r.ui = ui
+	return r
+}
+
+func (r *Root) SetScheme(schemes ...string) ApiRoot {
+	for _, s := range schemes {
+		if !isValidScheme(s) {
+			panic("echoswagger: invalid protocol scheme")
+		}
+	}
+	r.spec.Schemes = schemes
 	return r
 }
 

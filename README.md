@@ -31,7 +31,7 @@ import (
 
 func main() {
 	// ApiRoot with Echo instance
-	r := echoswagger.New(echo.New(), "/v1", "doc/", nil)
+	r := echoswagger.New(echo.New(), "", "doc/", nil)
 
 	// Routes with parameters & responses
 	r.POST("/", createUser).
@@ -58,12 +58,15 @@ func createUser(c echo.Context) error {
 ```
 r := echoswagger.New(echo.New(), "/v1", "doc/", nil)
 ```
+> Note: The parameter `basePath` is generally used when the access root path is not the root directory of the website after application is deployed. For example, the URL of an API in the program running locally is: `http://localhost:1323/users`, the actual URL after deployed to server is: `https://www.xxx.com/legacy-api/users`, then, when running locally, `basePath` should be `/`, when running on server, `basePath` should be `/legacy-api`.
+
 You can use the result `ApiRoot` instance to:
-- Setup Security definitions, request/response Content-Types, UI options, etc.
+- Setup Security definitions, request/response Content-Types, UI options, Scheme, etc.
 ```
 r.AddSecurityAPIKey("JWT", "JWT Token", echoswagger.SecurityInHeader).
 	SetRequestContentType("application/x-www-form-urlencoded", "multipart/form-data").
-	SetUI(UISetting{HideTop: true})
+	SetUI(UISetting{HideTop: true}).
+	SetScheme("https", "http")
 ```
 - Get `echo.Echo` instance.
 ```
