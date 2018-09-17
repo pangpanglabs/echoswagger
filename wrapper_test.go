@@ -95,6 +95,80 @@ func TestNew(t *testing.T) {
 	}
 }
 
+func TestPath(t *testing.T) {
+	tests := []struct {
+		baseInput, docInput                               string
+		baseOutput, docOutput, specOutput, realSpecOutput string
+		name                                              string
+	}{
+		{
+			baseInput:      "/",
+			docInput:       "doc/",
+			baseOutput:     "/",
+			docOutput:      "/doc/",
+			specOutput:     "/doc/swagger.json",
+			realSpecOutput: "/doc/swagger.json",
+			name:           "A",
+		}, {
+			baseInput:      "",
+			docInput:       "",
+			baseOutput:     "/",
+			docOutput:      "/",
+			specOutput:     "/swagger.json",
+			realSpecOutput: "/swagger.json",
+			name:           "B",
+		}, {
+			baseInput:      "/omni-api",
+			docInput:       "/doc",
+			baseOutput:     "/omni-api",
+			docOutput:      "/doc",
+			specOutput:     "/doc/swagger.json",
+			realSpecOutput: "/omni-api/doc/swagger.json",
+			name:           "C",
+		}, {
+			baseInput:      "/omni-api/",
+			docInput:       "",
+			baseOutput:     "/omni-api/",
+			docOutput:      "/",
+			specOutput:     "/swagger.json",
+			realSpecOutput: "/omni-api/swagger.json",
+			name:           "D",
+		}, {
+			baseInput:      "/omni-api",
+			docInput:       "doc/",
+			baseOutput:     "/omni-api",
+			docOutput:      "/doc/",
+			specOutput:     "/doc/swagger.json",
+			realSpecOutput: "/omni-api/doc/swagger.json",
+			name:           "F",
+		}, {
+			baseInput:      "omni-api",
+			docInput:       "doc/",
+			baseOutput:     "/omni-api",
+			docOutput:      "/doc/",
+			specOutput:     "/doc/swagger.json",
+			realSpecOutput: "/omni-api/doc/swagger.json",
+			name:           "G",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			apiRoot := New(echo.New(), tt.baseInput, tt.docInput, nil)
+			r := apiRoot.(*Root)
+
+			assert.Equal(t, r.spec.BasePath, tt.baseOutput)
+
+			assert.NotNil(t, r.echo)
+			assert.Len(t, r.echo.Routes(), 2)
+			res := r.echo.Routes()
+			paths := []string{res[0].Path, res[1].Path}
+			assert.ElementsMatch(t, paths, []string{tt.docOutput, tt.specOutput})
+
+			assert.Equal(t, tt.realSpecOutput, connectPath(tt.baseOutput, tt.specOutput))
+		})
+	}
+}
+
 func TestGroup(t *testing.T) {
 	r := prepareApiRoot()
 	t.Run("Normal", func(t *testing.T) {
@@ -292,24 +366,51 @@ func TestAddResponse(t *testing.T) {
 }
 
 func TestUI(t *testing.T) {
-	r := New(echo.New(), "/", "doc/", nil)
-	se := r.(*Root)
-	req := httptest.NewRequest(echo.GET, "/doc/", nil)
-	rec := httptest.NewRecorder()
-	c := se.echo.NewContext(req, rec)
-	h := se.docHandler("/doc/swagger.json")
+	t.Run("DefaultCDN", func(t *testing.T) {
+		r := New(echo.New(), "/", "doc/", nil)
+		se := r.(*Root)
+		req := httptest.NewRequest(echo.GET, "/doc/", nil)
+		rec := httptest.NewRecorder()
+		c := se.echo.NewContext(req, rec)
+		h := se.docHandler("/doc/swagger.json")
 
-	cdn := "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.18.0"
-	r.SetUI(UISetting{
-		HideTop: true,
-		CDN:     cdn,
+		if assert.NoError(t, h(c)) {
+			assert.Equal(t, http.StatusOK, rec.Code)
+			assert.Contains(t, rec.Body.String(), DefaultCDN)
+		}
 	})
 
-	if assert.NoError(t, h(c)) {
-		assert.Equal(t, http.StatusOK, rec.Code)
-		assert.Contains(t, rec.Body.String(), cdn)
-		assert.Contains(t, rec.Body.String(), "#swagger-ui>.swagger-container>.topbar")
-	}
+	t.Run("SetUI", func(t *testing.T) {
+		r := New(echo.New(), "/", "doc/", nil)
+		se := r.(*Root)
+		req := httptest.NewRequest(echo.GET, "/doc/", nil)
+		rec := httptest.NewRecorder()
+		c := se.echo.NewContext(req, rec)
+		h := se.docHandler("/doc/swagger.json")
+
+		cdn := "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.18.0"
+		r.SetUI(UISetting{
+			HideTop: true,
+			CDN:     cdn,
+		})
+
+		if assert.NoError(t, h(c)) {
+			assert.Equal(t, http.StatusOK, rec.Code)
+			assert.Contains(t, rec.Body.String(), cdn)
+			assert.Contains(t, rec.Body.String(), "#swagger-ui>.swagger-container>.topbar")
+		}
+	})
+}
+
+func TestScheme(t *testing.T) {
+	r := prepareApiRoot()
+	schemes := []string{"http", "https"}
+	r.SetScheme(schemes...)
+	assert.ElementsMatch(t, r.(*Root).spec.Schemes, schemes)
+
+	assert.Panics(t, func() {
+		r.SetScheme("grpc")
+	})
 }
 
 func TestRaw(t *testing.T) {

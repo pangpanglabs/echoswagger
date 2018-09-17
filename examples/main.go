@@ -13,7 +13,7 @@ func main() {
 func initServer() echoswagger.ApiRoot {
 	e := echo.New()
 
-	se := echoswagger.New(e, "/v2", "doc/", &echoswagger.Info{
+	se := echoswagger.New(e, "", "doc/", &echoswagger.Info{
 		Title:          "Swagger Petstore",
 		Description:    "This is a sample server Petstore server.  You can find out more about     Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).      For this sample, you can use the api key `special-key` to test the authorization     filters.",
 		Version:        "1.0.0",
@@ -36,7 +36,8 @@ func initServer() echoswagger.ApiRoot {
 
 	se.SetExternalDocs("Find out more about Swagger", "http://swagger.io").
 		SetResponseContentType("application/xml", "application/json").
-		SetUI(echoswagger.UISetting{HideTop: true})
+		SetUI(echoswagger.UISetting{HideTop: true}).
+		SetScheme("https", "http")
 
 	PetController{}.Init(se.Group("pet", "/pet"))
 	StoreController{}.Init(se.Group("store", "/store"))

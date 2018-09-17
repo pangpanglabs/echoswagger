@@ -31,7 +31,7 @@ import (
 
 func main() {
 	// ApiRoot with Echo instance
-	r := echoswagger.New(echo.New(), "/v1", "doc/", nil)
+	r := echoswagger.New(echo.New(), "", "doc/", nil)
 
 	// Routes with parameters & responses
 	r.POST("/", createUser).
@@ -58,12 +58,15 @@ func createUser(c echo.Context) error {
 ```
 r := echoswagger.New(echo.New(), "/v1", "doc/", nil)
 ```
+> 注意：参数`basePath`一般用于程序部署后访问路径并非网站根目录时的情况，比如程序运行在本地的某个API的URL为：`http://localhost:1323/users`，部署至服务器后的实际URL为：`https://www.xxx.com/legacy-api/users`，则本地运行时，`basePath`应该传入`/`, 部署至服务器时，`basePath`应该传入`/legacy-api`。
+
 你可以用这个`ApiRoot`来：
-- 设置Security定义, 请求/响应Content-Type，UI选项，等。
+- 设置Security定义, 请求/响应Content-Type，UI选项，Scheme等。
 ```
 r.AddSecurityAPIKey("JWT", "JWT Token", echoswagger.SecurityInHeader).
 	SetRequestContentType("application/x-www-form-urlencoded", "multipart/form-data").
-	SetUI(UISetting{HideTop: true})
+	SetUI(UISetting{HideTop: true}).
+	SetScheme("https", "http")
 ```
 - 获取`echo.Echo`实例。
 ```

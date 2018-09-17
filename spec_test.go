@@ -19,7 +19,7 @@ func TestSpec(t *testing.T) {
 		req := httptest.NewRequest(echo.GET, "/doc/swagger.json", nil)
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
-		j := `{"swagger":"2.0","info":{"title":"Project APIs","version":""},"host":"example.com","basePath":"/","schemes":["http"],"paths":{}}`
+		j := `{"swagger":"2.0","info":{"title":"Project APIs","version":""},"host":"example.com","basePath":"/","paths":{}}`
 		if assert.NoError(t, r.(*Root).Spec(c)) {
 			assert.Equal(t, http.StatusOK, rec.Code)
 			assert.JSONEq(t, j, rec.Body.String())
@@ -94,7 +94,7 @@ func TestSpec(t *testing.T) {
 		req := httptest.NewRequest(echo.GET, "/doc/swagger.json", nil)
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
-		j := `{"swagger":"2.0","info":{"title":"Project APIs","version":""},"host":"example.com","basePath":"/","schemes":["http"],"paths":{"/ping":{"get":{"responses":{"default":{"description":"successful operation"}}}},"/users/{id}":{"delete":{"tags":["Users"],"responses":{"default":{"description":"successful operation"}}}}},"tags":[{"name":"Users"}]}`
+		j := `{"swagger":"2.0","info":{"title":"Project APIs","version":""},"host":"example.com","basePath":"/","paths":{"/ping":{"get":{"responses":{"default":{"description":"successful operation"}}}},"/users/{id}":{"delete":{"tags":["Users"],"responses":{"default":{"description":"successful operation"}}}}},"tags":[{"name":"Users"}]}`
 		if assert.NoError(t, r.(*Root).Spec(c)) {
 			assert.Equal(t, http.StatusOK, rec.Code)
 			assert.JSONEq(t, j, rec.Body.String())

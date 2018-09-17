@@ -28,7 +28,6 @@ func (r *Root) genSpec(c echo.Context) error {
 	r.spec.Swagger = SwaggerVersion
 	r.spec.Paths = make(map[string]interface{})
 	r.spec.Host = c.Request().Host
-	r.spec.Schemes = []string{c.Scheme()}
 
 	for i := range r.groups {
 		group := &r.groups[i]

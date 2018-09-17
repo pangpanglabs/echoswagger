@@ -14,8 +14,9 @@
         "version": "1.0.0"
     },
     "host": "example.com",
-    "basePath": "/v2",
+    "basePath": "/",
     "schemes": [
+        "https",
         "http"
     ],
     "produces": [

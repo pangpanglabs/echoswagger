@@ -1,7 +1,7 @@
 package echoswagger
 
 // CDN refer to https://www.jsdelivr.com/package/npm/swagger-ui-dist
-const DefaultCDN = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@3.18.3-republish2"
+const DefaultCDN = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@3.19.0"
 
 const SwaggerUIContent = `{{define "swagger"}}
 <!DOCTYPE html>
@@ -50,7 +50,7 @@ const SwaggerUIContent = `{{define "swagger"}}
 
       // Build a system
       const ui = SwaggerUIBundle({
-        url: {{.url}},
+        url: this.window.location.origin+{{.path}},
         dom_id: '#swagger-ui',
         deepLinking: true,
         presets: [
