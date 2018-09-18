@@ -65,27 +65,34 @@ func isValidParam(t reflect.Type, nest, inner bool) bool {
 // invalid case:
 // 1. interface{}
 // 2. Map[Struct]string
-func isValidSchema(t reflect.Type, inner bool) bool {
+func isValidSchema(t reflect.Type, inner bool, pres ...reflect.Type) bool {
 	if t == nil {
 		return false
 	}
+	for _, pre := range pres {
+		if t == pre {
+			return true
+		}
+	}
+
 	switch t.Kind() {
 	case reflect.Bool, reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
 		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr,
 		reflect.Float32, reflect.Float64, reflect.String:
 		return true
 	case reflect.Array, reflect.Slice:
-		return isValidSchema(t.Elem(), inner)
+		return isValidSchema(t.Elem(), inner, pres...)
 	case reflect.Map:
-		return isBasicType(t.Key()) && isValidSchema(t.Elem(), true)
+		return isBasicType(t.Key()) && isValidSchema(t.Elem(), true, pres...)
 	case reflect.Ptr:
-		return isValidSchema(t.Elem(), inner)
+		return isValidSchema(t.Elem(), inner, pres...)
 	case reflect.Struct:
+		pres = append(pres, t)
 		if t == reflect.TypeOf(time.Time{}) {
 			return true
 		}
 		for i := 0; i < t.NumField(); i++ {
-			if !isValidSchema(t.Field(i).Type, true) {
+			if !isValidSchema(t.Field(i).Type, true, pres...) {
 				return false
 			}
 		}
