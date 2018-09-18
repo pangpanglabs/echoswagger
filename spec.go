@@ -116,6 +116,11 @@ func (r *RawDefineDic) addDefinition(v reflect.Value) string {
 		Properties: make(map[string]*JSONSchema),
 	}
 
+	(*r)[key] = RawDefine{
+		Value:  v,
+		Schema: schema,
+	}
+
 	for i := 0; i < v.NumField(); i++ {
 		f := v.Type().Field(i)
 		name := getFieldName(f, ParamInBody)
@@ -134,11 +139,6 @@ func (r *RawDefineDic) addDefinition(v reflect.Value) string {
 		schema.Properties[name] = sp
 
 		schema.handleSwaggerTags(f, name)
-	}
-
-	(*r)[key] = RawDefine{
-		Value:  v,
-		Schema: schema,
 	}
 
 	if schema.XML == nil {
