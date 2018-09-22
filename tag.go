@@ -54,10 +54,6 @@ func getFieldName(f reflect.StructField, in ParamInType) string {
 func (p *Parameter) handleSwaggerTags(field reflect.StructField, name string, in ParamInType) {
 	tags := getSwaggerTags(field)
 
-	var collect string
-	if t, ok := tags["collect"]; ok && contains([]string{"csv", "ssv", "tsv", "pipes"}, t) {
-		collect = t
-	}
 	if t, ok := tags["desc"]; ok {
 		p.Description = t
 	}
@@ -111,7 +107,6 @@ func (p *Parameter) handleSwaggerTags(field reflect.StructField, name string, in
 	// Move part of tags in Parameter to Items
 	if p.Type == "array" {
 		items := p.Items.latest()
-		items.CollectionFormat = collect
 		items.Minimum = p.Minimum
 		items.Maximum = p.Maximum
 		items.MinLength = p.MinLength
@@ -124,8 +119,6 @@ func (p *Parameter) handleSwaggerTags(field reflect.StructField, name string, in
 		p.MaxLength = nil
 		p.Enum = nil
 		p.Default = nil
-	} else {
-		p.CollectionFormat = collect
 	}
 }
 
@@ -204,10 +197,6 @@ func (s *JSONSchema) handleSwaggerTags(f reflect.StructField, name string) {
 func (h *Header) handleSwaggerTags(f reflect.StructField, name string) {
 	tags := getSwaggerTags(f)
 
-	var collect string
-	if t, ok := tags["collect"]; ok && contains([]string{"csv", "ssv", "tsv", "pipes"}, t) {
-		collect = t
-	}
 	if t, ok := tags["desc"]; ok {
 		h.Description = t
 	}
@@ -255,7 +244,6 @@ func (h *Header) handleSwaggerTags(f reflect.StructField, name string) {
 	// Move part of tags in Header to Items
 	if h.Type == "array" {
 		items := h.Items.latest()
-		items.CollectionFormat = collect
 		items.Minimum = h.Minimum
 		items.Maximum = h.Maximum
 		items.MinLength = h.MinLength
@@ -268,8 +256,6 @@ func (h *Header) handleSwaggerTags(f reflect.StructField, name string) {
 		h.MaxLength = nil
 		h.Enum = nil
 		h.Default = nil
-	} else {
-		h.CollectionFormat = collect
 	}
 }
 

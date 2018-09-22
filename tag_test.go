@@ -55,7 +55,7 @@ func TestSchemaSwaggerTags(t *testing.T) {
 func TestParamSwaggerTags(t *testing.T) {
 	type SearchInput struct {
 		Q              string     `query:"q" swagger:"minLen(5),maxLen(8)"`
-		BrandIds       string     `query:"brandIds" swagger:"collect(csv),allowEmpty"`
+		BrandIds       string     `query:"brandIds" swagger:"allowEmpty"`
 		Sortby         [][]string `query:"sortby" swagger:"default(id),allowEmpty"`
 		Order          []int      `query:"order" swagger:"enum(0|1|n)"`
 		SkipCount      int        `query:"skipCount" swagger:"min(0),max(999)"`
@@ -68,11 +68,12 @@ func TestParamSwaggerTags(t *testing.T) {
 	assert.Len(t, o.Parameters, 6)
 	assert.Equal(t, *o.Parameters[0].MinLength, 5)
 	assert.Equal(t, *o.Parameters[0].MaxLength, 8)
-	assert.Equal(t, o.Parameters[1].CollectionFormat, "csv")
 	assert.Equal(t, o.Parameters[1].AllowEmptyValue, true)
 	assert.Equal(t, o.Parameters[2].AllowEmptyValue, true)
 	assert.Equal(t, o.Parameters[2].Items.Items.Default, "id")
+	assert.Equal(t, o.Parameters[2].Items.CollectionFormat, "multi")
 	assert.ElementsMatch(t, o.Parameters[3].Items.Enum, []int{0, 1})
+	assert.Equal(t, o.Parameters[3].CollectionFormat, "multi")
 	assert.Equal(t, *o.Parameters[4].Minimum, float64(0))
 	assert.Equal(t, *o.Parameters[4].Maximum, float64(999))
 	assert.Equal(t, o.Parameters[5].Description, "items count in one page")
@@ -82,7 +83,6 @@ func TestHeaderSwaggerTags(t *testing.T) {
 	type SearchInput struct {
 		Q              string     `json:"q" swagger:"minLen(5),maxLen(8)"`
 		Enable         bool       `json:"-"`
-		BrandIds       string     `json:"brandIds" swagger:"collect(csv)"`
 		Sortby         [][]string `json:"sortby" swagger:"default(id)"`
 		Order          []int      `json:"order" swagger:"enum(0|1|n)"`
 		SkipCount      int        `json:"skipCount" swagger:"min(0),max(999)"`
@@ -94,12 +94,13 @@ func TestHeaderSwaggerTags(t *testing.T) {
 	o := a.(*api).operation
 	c := strconv.Itoa(http.StatusOK)
 	h := o.Responses[c].Headers
-	assert.Len(t, h, 6)
+	assert.Len(t, h, 5)
 	assert.Equal(t, *h["q"].MinLength, 5)
 	assert.Equal(t, *h["q"].MaxLength, 8)
-	assert.Equal(t, h["brandIds"].CollectionFormat, "csv")
 	assert.Equal(t, h["sortby"].Items.Items.Default, "id")
+	assert.Equal(t, h["sortby"].Items.CollectionFormat, "multi")
 	assert.ElementsMatch(t, h["order"].Items.Enum, []int{0, 1})
+	assert.Equal(t, h["order"].CollectionFormat, "multi")
 	assert.Equal(t, *h["skipCount"].Minimum, float64(0))
 	assert.Equal(t, *h["skipCount"].Maximum, float64(999))
 	assert.Equal(t, h["maxResultCount"].Description, "items count in one page")
