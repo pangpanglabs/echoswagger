@@ -212,7 +212,6 @@ a.AddParamBody(&User{}, "Body", "", true)
 
 Tag | Type | Description
 ---|:---:|---
-collect | `string` | 如果类型是数组，确定其格式。可能的值有：<ul><li>`csv` - 逗号分隔的值 `foo,bar`。<li>`ssv` - 空格分隔的值 `foo bar`。<li>`tsv` - tab分隔的值 `foo\tbar`。<li>`pipes` - pipe分隔的值 `foo\|bar`。</ul>默认值是 `csv`。
 desc | `string` | 描述。
 maximum | `number` | -
 minimum | `number` | -

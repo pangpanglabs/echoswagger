@@ -212,7 +212,6 @@ The definition is equivalent to:
 
 Tag | Type | Description
 ---|:---:|---
-collect | `string` | Determines the format of the array if type array is used. Possible values are: <ul><li>`csv` - comma separated values `foo,bar`. <li>`ssv` - space separated values `foo bar`. <li>`tsv` - tab separated values `foo\tbar`. <li>`pipes` - pipe separated values `foo\|bar`. </ul> Default value is `csv`.
 desc | `string` | Description.
 maximum | `number` | -
 minimum | `number` | -
