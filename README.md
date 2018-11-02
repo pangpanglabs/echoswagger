@@ -132,14 +132,14 @@ The methods which name's suffix are `Nested` means these methods treat parameter
 e.g.
 ```
 type SearchInput struct {
-	Q         string `query:"q" swagger:"desc("Keywords"),required"`
+	Q         string `query:"q" swagger:"desc(Keywords),required"`
 	SkipCount int    `query:"skipCount"`
 }
 a.AddParamQueryNested(SearchInput{})
 ```
 Is equivalent to:
 ```
-a.AddParamQuery("", "q", "", true).
+a.AddParamQuery("", "q", "Keywords", true).
 	AddParamQuery(0, "skipCount", "", false)
 ```
 - Add responses.
