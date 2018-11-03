@@ -1,6 +1,7 @@
 package echoswagger
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -105,6 +106,52 @@ func TestSpec(t *testing.T) {
 		assert.Len(t, r.(*Root).groups, 0)
 		assert.Len(t, r.(*Root).apis, 0)
 	})
+}
+
+func TestRefererHost(t *testing.T) {
+	tests := []struct {
+		name, referer, host string
+	}{
+		{
+			referer: "http://localhost:1323/doc",
+			host:    "localhost:1323",
+			name:    "A",
+		},
+		{
+			referer: "1/doc",
+			host:    "127.0.0.1",
+			name:    "B",
+		},
+		{
+			referer: "http://user:pass@github.com",
+			host:    "github.com",
+			name:    "C",
+		},
+		{
+			referer: "https://www.github.com?q=1",
+			host:    "www.github.com",
+			name:    "D",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := prepareApiRoot()
+			e := r.(*Root).echo
+			req := httptest.NewRequest(echo.GET, "http://127.0.0.1/doc/swagger.json", nil)
+			req.Header.Add("referer", tt.referer)
+			rec := httptest.NewRecorder()
+			c := e.NewContext(req, rec)
+			if assert.NoError(t, r.(*Root).Spec(c)) {
+				assert.Equal(t, http.StatusOK, rec.Code)
+				var v struct {
+					Host string `json:"host"`
+				}
+				err := json.Unmarshal(rec.Body.Bytes(), &v)
+				assert.NoError(t, err)
+				assert.Equal(t, tt.host, v.Host)
+			}
+		})
+	}
 }
 
 func TestAddDefinition(t *testing.T) {
