@@ -3,6 +3,7 @@ package echoswagger
 import (
 	"encoding/xml"
 	"net/http"
+	"net/url"
 	"reflect"
 
 	"github.com/labstack/echo"
@@ -21,13 +22,17 @@ func (r *Root) Spec(c echo.Context) error {
 	if r.err != nil {
 		return c.String(http.StatusInternalServerError, r.err.Error())
 	}
+	if uri, err := url.ParseRequestURI(c.Request().Referer()); err == nil {
+		r.spec.Host = uri.Host
+	} else {
+		r.spec.Host = c.Request().Host
+	}
 	return c.JSON(http.StatusOK, r.spec)
 }
 
 func (r *Root) genSpec(c echo.Context) error {
 	r.spec.Swagger = SwaggerVersion
 	r.spec.Paths = make(map[string]interface{})
-	r.spec.Host = c.Request().Host
 
 	for i := range r.groups {
 		group := &r.groups[i]
