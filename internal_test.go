@@ -141,9 +141,10 @@ func TestSchemaTypes(t *testing.T) {
 	var pe map[time.Time]string
 	var pf map[*int]string
 	type PU struct {
-		Unknown interface{}
+		Any interface{}
 	}
 	var pg PU
+	var ph map[string]interface{}
 	tests := []struct {
 		p     interface{}
 		panic bool
@@ -196,8 +197,13 @@ func TestSchemaTypes(t *testing.T) {
 		},
 		{
 			p:     &pg,
-			panic: true,
-			name:  "Struct inner invalid type",
+			panic: false,
+			name:  "Struct interface field type",
+		},
+		{
+			p:     &ph,
+			panic: false,
+			name:  "Map interface value type",
 		},
 	}
 	for _, tt := range tests {
