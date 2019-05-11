@@ -12,7 +12,7 @@ import (
 )
 
 func prepareApiRoot() ApiRoot {
-	return New(echo.New(), "/", "doc/", nil)
+	return New(echo.New(), "doc/", nil)
 }
 
 func prepareApiGroup() ApiGroup {
@@ -29,7 +29,6 @@ func prepareApi() Api {
 func TestNew(t *testing.T) {
 	tests := []struct {
 		echo        *echo.Echo
-		basePath    string
 		docPath     string
 		info        *Info
 		expectPaths []string
@@ -38,7 +37,6 @@ func TestNew(t *testing.T) {
 	}{
 		{
 			echo:        echo.New(),
-			basePath:    "/",
 			docPath:     "doc/",
 			info:        nil,
 			expectPaths: []string{"/doc/", "/doc/swagger.json"},
@@ -46,9 +44,8 @@ func TestNew(t *testing.T) {
 			name:        "Normal",
 		},
 		{
-			echo:     echo.New(),
-			basePath: "/",
-			docPath:  "doc",
+			echo:    echo.New(),
+			docPath: "doc",
 			info: &Info{
 				Title: "Test project",
 				Contact: &Contact{
@@ -69,16 +66,15 @@ func TestNew(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.panic {
 				assert.Panics(t, func() {
-					New(tt.echo, tt.basePath, tt.docPath, tt.info)
+					New(tt.echo, tt.docPath, tt.info)
 				})
 			} else {
-				apiRoot := New(tt.echo, tt.basePath, tt.docPath, tt.info)
+				apiRoot := New(tt.echo, tt.docPath, tt.info)
 				assert.NotNil(t, apiRoot.(*Root))
 
 				r := apiRoot.(*Root)
 				assert.NotNil(t, r.spec)
 
-				assert.Equal(t, r.spec.BasePath, tt.basePath)
 				if tt.info == nil {
 					assert.Equal(t, r.spec.Info.Title, "Project APIs")
 				} else {
@@ -97,74 +93,36 @@ func TestNew(t *testing.T) {
 
 func TestPath(t *testing.T) {
 	tests := []struct {
-		baseInput, docInput                               string
-		baseOutput, docOutput, specOutput, realSpecOutput string
-		name                                              string
+		docInput              string
+		docOutput, specOutput string
+		name                  string
 	}{
 		{
-			baseInput:      "/",
-			docInput:       "doc/",
-			baseOutput:     "/",
-			docOutput:      "/doc/",
-			specOutput:     "/doc/swagger.json",
-			realSpecOutput: "/doc/swagger.json",
-			name:           "A",
+			docInput:   "doc/",
+			docOutput:  "/doc/",
+			specOutput: "/doc/swagger.json",
+			name:       "A",
 		}, {
-			baseInput:      "",
-			docInput:       "",
-			baseOutput:     "/",
-			docOutput:      "/",
-			specOutput:     "/swagger.json",
-			realSpecOutput: "/swagger.json",
-			name:           "B",
+			docInput:   "",
+			docOutput:  "/",
+			specOutput: "/swagger.json",
+			name:       "B",
 		}, {
-			baseInput:      "/omni-api",
-			docInput:       "/doc",
-			baseOutput:     "/omni-api",
-			docOutput:      "/doc",
-			specOutput:     "/doc/swagger.json",
-			realSpecOutput: "/omni-api/doc/swagger.json",
-			name:           "C",
-		}, {
-			baseInput:      "/omni-api/",
-			docInput:       "",
-			baseOutput:     "/omni-api/",
-			docOutput:      "/",
-			specOutput:     "/swagger.json",
-			realSpecOutput: "/omni-api/swagger.json",
-			name:           "D",
-		}, {
-			baseInput:      "/omni-api",
-			docInput:       "doc/",
-			baseOutput:     "/omni-api",
-			docOutput:      "/doc/",
-			specOutput:     "/doc/swagger.json",
-			realSpecOutput: "/omni-api/doc/swagger.json",
-			name:           "F",
-		}, {
-			baseInput:      "omni-api",
-			docInput:       "doc/",
-			baseOutput:     "/omni-api",
-			docOutput:      "/doc/",
-			specOutput:     "/doc/swagger.json",
-			realSpecOutput: "/omni-api/doc/swagger.json",
-			name:           "G",
+			docInput:   "/doc",
+			docOutput:  "/doc",
+			specOutput: "/doc/swagger.json",
+			name:       "C",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			apiRoot := New(echo.New(), tt.baseInput, tt.docInput, nil)
+			apiRoot := New(echo.New(), tt.docInput, nil)
 			r := apiRoot.(*Root)
-
-			assert.Equal(t, r.spec.BasePath, tt.baseOutput)
-
 			assert.NotNil(t, r.echo)
 			assert.Len(t, r.echo.Routes(), 2)
 			res := r.echo.Routes()
 			paths := []string{res[0].Path, res[1].Path}
 			assert.ElementsMatch(t, paths, []string{tt.docOutput, tt.specOutput})
-
-			assert.Equal(t, tt.realSpecOutput, connectPath(tt.baseOutput, tt.specOutput))
 		})
 	}
 }
@@ -367,12 +325,12 @@ func TestAddResponse(t *testing.T) {
 
 func TestUI(t *testing.T) {
 	t.Run("DefaultCDN", func(t *testing.T) {
-		r := New(echo.New(), "/", "doc/", nil)
+		r := New(echo.New(), "doc/", nil)
 		se := r.(*Root)
 		req := httptest.NewRequest(echo.GET, "/doc/", nil)
 		rec := httptest.NewRecorder()
 		c := se.echo.NewContext(req, rec)
-		h := se.docHandler("/doc/swagger.json")
+		h := se.docHandler()
 
 		if assert.NoError(t, h(c)) {
 			assert.Equal(t, http.StatusOK, rec.Code)
@@ -381,12 +339,12 @@ func TestUI(t *testing.T) {
 	})
 
 	t.Run("SetUI", func(t *testing.T) {
-		r := New(echo.New(), "/", "doc/", nil)
+		r := New(echo.New(), "doc/", nil)
 		se := r.(*Root)
 		req := httptest.NewRequest(echo.GET, "/doc/", nil)
 		rec := httptest.NewRecorder()
 		c := se.echo.NewContext(req, rec)
-		h := se.docHandler("/doc/swagger.json")
+		h := se.docHandler()
 
 		cdn := "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.18.0"
 		r.SetUI(UISetting{

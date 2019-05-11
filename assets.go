@@ -47,10 +47,13 @@ const SwaggerUIContent = `{{define "swagger"}}
     <script src="{{.cdn}}/swagger-ui-standalone-preset.js" crossorigin="anonymous"></script>
     <script>
     window.onload = function() {
-
+      var specPath = "{{.specName}}"
+      if (!window.location.pathname.endsWith("/")) {
+        specPath = "/" + specPath
+      }
       // Build a system
       const ui = SwaggerUIBundle({
-        url: this.window.location.origin+{{.path}},
+        url: window.location.origin+window.location.pathname+specPath,
         dom_id: '#swagger-ui',
         deepLinking: true,
         presets: [

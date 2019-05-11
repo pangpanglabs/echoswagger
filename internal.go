@@ -31,7 +31,7 @@ type RawDefine struct {
 	Schema *JSONSchema
 }
 
-func (r *Root) docHandler(realSpecPath string) echo.HandlerFunc {
+func (r *Root) docHandler() echo.HandlerFunc {
 	t, err := template.New("swagger").Parse(SwaggerUIContent)
 	if err != nil {
 		panic(err)
@@ -43,10 +43,10 @@ func (r *Root) docHandler(realSpecPath string) echo.HandlerFunc {
 		}
 		buf := new(bytes.Buffer)
 		t.Execute(buf, map[string]interface{}{
-			"title":   r.spec.Info.Title,
-			"hideTop": r.ui.HideTop,
-			"path":    realSpecPath,
-			"cdn":     cdn,
+			"title":    r.spec.Info.Title,
+			"hideTop":  r.ui.HideTop,
+			"cdn":      cdn,
+			"specName": SpecName,
 		})
 		return c.HTMLBlob(http.StatusOK, buf.Bytes())
 	}
