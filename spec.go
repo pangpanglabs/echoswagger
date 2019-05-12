@@ -12,22 +12,29 @@ import (
 const (
 	DefPrefix      = "#/definitions/"
 	SwaggerVersion = "2.0"
+	SpecName       = "swagger.json"
 )
 
-func (r *Root) Spec(c echo.Context) error {
-	r.once.Do(func() {
-		r.err = r.genSpec(c)
-		r.cleanUp()
-	})
-	if r.err != nil {
-		return c.String(http.StatusInternalServerError, r.err.Error())
+func (r *Root) SpecHandler(docPath string) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		r.once.Do(func() {
+			r.err = r.genSpec(c)
+			r.cleanUp()
+		})
+		if r.err != nil {
+			return c.String(http.StatusInternalServerError, r.err.Error())
+		}
+		var basePath string
+		if uri, err := url.ParseRequestURI(c.Request().Referer()); err == nil {
+			basePath = trimSuffixSlash(uri.Path, docPath)
+			r.spec.Host = uri.Host
+		} else {
+			basePath = trimSuffixSlash(c.Request().URL.Path, connectPath(docPath, SpecName))
+			r.spec.Host = c.Request().Host
+		}
+		r.spec.BasePath = connectPath(basePath)
+		return c.JSON(http.StatusOK, r.spec)
 	}
-	if uri, err := url.ParseRequestURI(c.Request().Referer()); err == nil {
-		r.spec.Host = uri.Host
-	} else {
-		r.spec.Host = c.Request().Host
-	}
-	return c.JSON(http.StatusOK, r.spec)
 }
 
 func (r *Root) genSpec(c echo.Context) error {

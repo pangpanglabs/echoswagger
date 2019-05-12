@@ -21,7 +21,7 @@ func TestSpec(t *testing.T) {
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 		j := `{"swagger":"2.0","info":{"title":"Project APIs","version":""},"host":"example.com","basePath":"/","paths":{}}`
-		if assert.NoError(t, r.(*Root).Spec(c)) {
+		if assert.NoError(t, r.(*Root).SpecHandler("/doc/")(c)) {
 			assert.Equal(t, http.StatusOK, rec.Code)
 			assert.JSONEq(t, j, rec.Body.String())
 		}
@@ -41,7 +41,7 @@ func TestSpec(t *testing.T) {
 		req := httptest.NewRequest(echo.GET, "/doc/swagger.json", nil)
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
-		if assert.NoError(t, r.(*Root).Spec(c)) {
+		if assert.NoError(t, r.(*Root).SpecHandler("/doc")(c)) {
 			assert.Equal(t, http.StatusOK, rec.Code)
 			s := r.(*Root).spec
 			assert.Len(t, s.Paths, 1)
@@ -63,7 +63,7 @@ func TestSpec(t *testing.T) {
 		req := httptest.NewRequest(echo.GET, "/doc/swagger.json", nil)
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
-		if assert.NoError(t, r.(*Root).Spec(c)) {
+		if assert.NoError(t, r.(*Root).SpecHandler("/doc")(c)) {
 			assert.Equal(t, http.StatusInternalServerError, rec.Code)
 		}
 	})
@@ -76,7 +76,7 @@ func TestSpec(t *testing.T) {
 		req := httptest.NewRequest(echo.GET, "/doc/swagger.json", nil)
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
-		if assert.NoError(t, r.(*Root).Spec(c)) {
+		if assert.NoError(t, r.(*Root).SpecHandler("/doc")(c)) {
 			assert.Equal(t, http.StatusInternalServerError, rec.Code)
 		}
 	})
@@ -96,7 +96,7 @@ func TestSpec(t *testing.T) {
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 		j := `{"swagger":"2.0","info":{"title":"Project APIs","version":""},"host":"example.com","basePath":"/","paths":{"/ping":{"get":{"responses":{"default":{"description":"successful operation"}}}},"/users/{id}":{"delete":{"tags":["Users"],"responses":{"default":{"description":"successful operation"}}}}},"tags":[{"name":"Users"}]}`
-		if assert.NoError(t, r.(*Root).Spec(c)) {
+		if assert.NoError(t, r.(*Root).SpecHandler("/doc")(c)) {
 			assert.Equal(t, http.StatusOK, rec.Code)
 			assert.JSONEq(t, j, rec.Body.String())
 		}
@@ -108,29 +108,72 @@ func TestSpec(t *testing.T) {
 	})
 }
 
-func TestRefererHost(t *testing.T) {
+func TestReferer(t *testing.T) {
 	tests := []struct {
-		name, referer, host string
+		name, referer, host, docPath, basePath string
 	}{
 		{
-			referer: "http://localhost:1323/doc",
-			host:    "localhost:1323",
-			name:    "A",
+			referer:  "http://localhost:1323/doc",
+			host:     "localhost:1323",
+			docPath:  "/doc",
+			name:     "A",
+			basePath: "/",
 		},
 		{
-			referer: "1/doc",
-			host:    "127.0.0.1",
-			name:    "B",
+			referer:  "http://localhost:1323/doc",
+			host:     "localhost:1323",
+			docPath:  "/doc/",
+			name:     "B",
+			basePath: "/",
 		},
 		{
-			referer: "http://user:pass@github.com",
-			host:    "github.com",
-			name:    "C",
+			referer:  "http://localhost:1323/doc/",
+			host:     "localhost:1323",
+			docPath:  "/doc",
+			name:     "C",
+			basePath: "/",
 		},
 		{
-			referer: "https://www.github.com?q=1",
-			host:    "www.github.com",
-			name:    "D",
+			referer:  "http://localhost:1323/api/v1/doc",
+			host:     "localhost:1323",
+			docPath:  "/doc",
+			name:     "D",
+			basePath: "/api/v1",
+		},
+		{
+			referer:  "1/doc",
+			host:     "127.0.0.1",
+			docPath:  "/doc",
+			name:     "E",
+			basePath: "/",
+		},
+		{
+			referer:  "http://user:pass@github.com",
+			host:     "github.com",
+			docPath:  "/",
+			name:     "F",
+			basePath: "/",
+		},
+		{
+			referer:  "https://www.github.com/v1/docs/?q=1",
+			host:     "www.github.com",
+			docPath:  "/docs/",
+			name:     "G",
+			basePath: "/v1",
+		},
+		{
+			referer:  "https://www.github.com/?q=1#tag=TAG",
+			host:     "www.github.com",
+			docPath:  "",
+			name:     "H",
+			basePath: "/",
+		},
+		{
+			referer:  "https://www.github.com/",
+			host:     "www.github.com",
+			docPath:  "/doc",
+			name:     "I",
+			basePath: "/",
 		},
 	}
 	for _, tt := range tests {
@@ -141,14 +184,16 @@ func TestRefererHost(t *testing.T) {
 			req.Header.Add("referer", tt.referer)
 			rec := httptest.NewRecorder()
 			c := e.NewContext(req, rec)
-			if assert.NoError(t, r.(*Root).Spec(c)) {
+			if assert.NoError(t, r.(*Root).SpecHandler(tt.docPath)(c)) {
 				assert.Equal(t, http.StatusOK, rec.Code)
 				var v struct {
-					Host string `json:"host"`
+					Host     string `json:"host"`
+					BasePath string `json:"basePath"`
 				}
 				err := json.Unmarshal(rec.Body.Bytes(), &v)
 				assert.NoError(t, err)
 				assert.Equal(t, tt.host, v.Host)
+				assert.Equal(t, tt.basePath, v.BasePath)
 			}
 		})
 	}
@@ -181,7 +226,7 @@ func TestAddDefinition(t *testing.T) {
 	req := httptest.NewRequest(echo.GET, "/doc/swagger.json", nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	if assert.NoError(t, r.(*Root).Spec(c)) {
+	if assert.NoError(t, r.(*Root).SpecHandler("/doc")(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 		assert.Len(t, r.(*Root).spec.Definitions, 2)
 	}

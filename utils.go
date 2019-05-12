@@ -1,6 +1,9 @@
 package echoswagger
 
-import "reflect"
+import (
+	"reflect"
+	"strings"
+)
 
 func contains(list []string, s string) bool {
 	for _, t := range list {
@@ -84,4 +87,20 @@ func connectPath(paths ...string) string {
 		result += path
 	}
 	return result
+}
+
+func removeTrailingSlash(path string) string {
+	l := len(path) - 1
+	if l > 0 && strings.HasSuffix(path, "/") {
+		path = path[:l]
+	}
+	return path
+}
+
+func trimSuffixSlash(s, suffix string) string {
+	s = connectPath(s)
+	suffix = connectPath(suffix)
+	s = removeTrailingSlash(s)
+	suffix = removeTrailingSlash(suffix)
+	return strings.TrimSuffix(s, suffix)
 }

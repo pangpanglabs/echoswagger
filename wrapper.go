@@ -209,7 +209,7 @@ type api struct {
 
 // New creates ApiRoot instance.
 // Multiple ApiRoot are allowed in one project.
-func New(e *echo.Echo, basePath, docPath string, i *Info) ApiRoot {
+func New(e *echo.Echo, docPath string, i *Info) ApiRoot {
 	if e == nil {
 		panic("echoswagger: invalid Echo instance")
 	}
@@ -225,7 +225,6 @@ func New(e *echo.Echo, basePath, docPath string, i *Info) ApiRoot {
 		spec: &Swagger{
 			Info:                i,
 			SecurityDefinitions: make(map[string]*SecurityDefinition),
-			BasePath:            connectPath(basePath),
 			Definitions:         make(map[string]*JSONSchema),
 		},
 		routers: routers{
@@ -233,10 +232,8 @@ func New(e *echo.Echo, basePath, docPath string, i *Info) ApiRoot {
 		},
 	}
 
-	specPath := connectPath(docPath, "swagger.json")
-	realSpecPath := connectPath(basePath, specPath)
-	e.GET(connectPath(docPath), r.docHandler(realSpecPath))
-	e.GET(specPath, r.Spec)
+	e.GET(connectPath(docPath), r.docHandler())
+	e.GET(connectPath(docPath, SpecName), r.SpecHandler(docPath))
 	return r
 }
 

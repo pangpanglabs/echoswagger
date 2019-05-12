@@ -18,7 +18,7 @@ func TestMain(t *testing.T) {
 	c := e.Echo().NewContext(req, rec)
 	b, err := ioutil.ReadFile("./swagger.json")
 	assert.Nil(t, err)
-	if assert.NoError(t, e.(*echoswagger.Root).Spec(c)) {
+	if assert.NoError(t, e.(*echoswagger.Root).SpecHandler("/doc")(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 		assert.JSONEq(t, string(b), rec.Body.String())
 	}
