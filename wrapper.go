@@ -67,6 +67,7 @@ type ApiRoot interface {
 	AddSecurityOAuth2(name, desc string, flow OAuth2FlowType, authorizationUrl, tokenUrl string, scopes map[string]string) ApiRoot
 
 	// SetUI sets UI setting.
+	// If DetachSpec is false, HideTop will not take effect
 	SetUI(ui UISetting) ApiRoot
 
 	// SetScheme sets available protocol schemes.
@@ -232,8 +233,8 @@ func New(e *echo.Echo, docPath string, i *Info) ApiRoot {
 		},
 	}
 
-	e.GET(connectPath(docPath), r.docHandler())
-	e.GET(connectPath(docPath, SpecName), r.SpecHandler(docPath))
+	e.GET(connectPath(docPath), r.docHandler(docPath))
+	e.GET(connectPath(docPath, SpecName), r.specHandler(docPath))
 	return r
 }
 

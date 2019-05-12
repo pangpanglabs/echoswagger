@@ -31,7 +31,7 @@ import (
 
 func main() {
 	// ApiRoot with Echo instance
-	r := echoswagger.New(echo.New(), "", "doc/", nil)
+	r := echoswagger.New(echo.New(), "doc/", nil)
 
 	// Routes with parameters & responses
 	r.POST("/", createUser).

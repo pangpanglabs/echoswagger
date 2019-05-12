@@ -51,9 +51,11 @@ const SwaggerUIContent = `{{define "swagger"}}
       if (!window.location.pathname.endsWith("/")) {
         specPath = "/" + specPath
       }
+      var spec = "{{.spec}}"
       // Build a system
       const ui = SwaggerUIBundle({
         url: window.location.origin+window.location.pathname+specPath,
+        spec: spec ? JSON.parse(spec) : undefined,
         dom_id: '#swagger-ui',
         deepLinking: true,
         presets: [

@@ -2,6 +2,7 @@ package echoswagger
 
 import (
 	"bytes"
+	"encoding/json"
 	"html/template"
 	"net/http"
 	"reflect"
@@ -20,8 +21,9 @@ const (
 )
 
 type UISetting struct {
-	HideTop bool
-	CDN     string
+	DetachSpec bool
+	HideTop    bool
+	CDN        string
 }
 
 type RawDefineDic map[string]RawDefine
@@ -31,7 +33,7 @@ type RawDefine struct {
 	Schema *JSONSchema
 }
 
-func (r *Root) docHandler() echo.HandlerFunc {
+func (r *Root) docHandler(docPath string) echo.HandlerFunc {
 	t, err := template.New("swagger").Parse(SwaggerUIContent)
 	if err != nil {
 		panic(err)
@@ -42,12 +44,26 @@ func (r *Root) docHandler() echo.HandlerFunc {
 			cdn = DefaultCDN
 		}
 		buf := new(bytes.Buffer)
-		t.Execute(buf, map[string]interface{}{
+		params := map[string]interface{}{
 			"title":    r.spec.Info.Title,
-			"hideTop":  r.ui.HideTop,
 			"cdn":      cdn,
 			"specName": SpecName,
-		})
+		}
+		if !r.ui.DetachSpec {
+			spec, err := r.GetSpec(c, docPath)
+			if err != nil {
+				return c.String(http.StatusInternalServerError, err.Error())
+			}
+			b, err := json.Marshal(spec)
+			if err != nil {
+				return c.String(http.StatusInternalServerError, err.Error())
+			}
+			params["spec"] = string(b)
+			params["hideTop"] = true
+		} else {
+			params["hideTop"] = r.ui.HideTop
+		}
+		t.Execute(buf, params)
 		return c.HTMLBlob(http.StatusOK, buf.Bytes())
 	}
 }

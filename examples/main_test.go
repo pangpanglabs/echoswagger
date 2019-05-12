@@ -1,8 +1,8 @@
 package main
 
 import (
+	"encoding/json"
 	"io/ioutil"
-	"net/http"
 	"net/http/httptest"
 	"testing"
 
@@ -18,8 +18,9 @@ func TestMain(t *testing.T) {
 	c := e.Echo().NewContext(req, rec)
 	b, err := ioutil.ReadFile("./swagger.json")
 	assert.Nil(t, err)
-	if assert.NoError(t, e.(*echoswagger.Root).SpecHandler("/doc")(c)) {
-		assert.Equal(t, http.StatusOK, rec.Code)
-		assert.JSONEq(t, string(b), rec.Body.String())
-	}
+	s, err := e.(*echoswagger.Root).GetSpec(c, "/doc")
+	assert.Nil(t, err)
+	rs, err := json.Marshal(s)
+	assert.Nil(t, err)
+	assert.JSONEq(t, string(b), string(rs))
 }
