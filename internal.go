@@ -59,6 +59,7 @@ func (r *Root) docHandler(docPath string) echo.HandlerFunc {
 				return c.String(http.StatusInternalServerError, err.Error())
 			}
 			params["spec"] = string(b)
+			params["docPath"] = docPath
 			params["hideTop"] = true
 		} else {
 			params["hideTop"] = r.ui.HideTop

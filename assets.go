@@ -51,11 +51,23 @@ const SwaggerUIContent = `{{define "swagger"}}
       if (!window.location.pathname.endsWith("/")) {
         specPath = "/" + specPath
       }
-      var spec = "{{.spec}}"
+      var specStr = "{{.spec}}"
+      var spec = specStr ? JSON.parse(specStr) : undefined
+      if (spec) {
+        spec.host = window.location.host
+        var docPath = "{{.docPath}}"
+        var basePath = window.location.pathname
+        if (!docPath.endsWith("/")) { docPath += "/" }
+        if (!basePath.endsWith("/")) { basePath += "/" }
+        if (basePath.endsWith(docPath)) {
+          basePath = basePath.slice(0, -docPath.length)
+        }
+        spec.basePath = basePath
+      }
       // Build a system
       const ui = SwaggerUIBundle({
         url: window.location.origin+window.location.pathname+specPath,
-        spec: spec ? JSON.parse(spec) : undefined,
+        spec: spec,
         dom_id: '#swagger-ui',
         deepLinking: true,
         presets: [
