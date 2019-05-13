@@ -31,7 +31,7 @@ import (
 
 func main() {
 	// ApiRoot with Echo instance
-	r := echoswagger.New(echo.New(), "doc/", nil)
+	r := echoswagger.New(echo.New(), "/doc", nil)
 
 	// Routes with parameters & responses
 	r.POST("/", createUser).
@@ -56,7 +56,7 @@ func createUser(c echo.Context) error {
 ## 用法
 #### 用`New()`创建`ApiRoot`，此方法是对`echo.New()`方法的封装
 ```
-r := echoswagger.New(echo.New(), "/v1", "doc/", nil)
+r := echoswagger.New(echo.New(), "/doc", nil)
 ```
 你可以用这个`ApiRoot`来：
 - 设置Security定义, 请求/响应Content-Type，UI选项，Scheme等。

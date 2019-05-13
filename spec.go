@@ -21,11 +21,20 @@ func (r *Root) specHandler(docPath string) echo.HandlerFunc {
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
+		var basePath string
+		if uri, err := url.ParseRequestURI(c.Request().Referer()); err == nil {
+			basePath = trimSuffixSlash(uri.Path, docPath)
+			spec.Host = uri.Host
+		} else {
+			basePath = trimSuffixSlash(c.Request().URL.Path, connectPath(docPath, SpecName))
+			spec.Host = c.Request().Host
+		}
+		spec.BasePath = basePath
 		return c.JSON(http.StatusOK, spec)
 	}
 }
 
-// Generate swagger spec data
+// Generate swagger spec data, without host & basePath info
 func (r *Root) GetSpec(c echo.Context, docPath string) (Swagger, error) {
 	r.once.Do(func() {
 		r.err = r.genSpec(c)
@@ -34,17 +43,7 @@ func (r *Root) GetSpec(c echo.Context, docPath string) (Swagger, error) {
 	if r.err != nil {
 		return Swagger{}, r.err
 	}
-	swagger := *r.spec
-	var basePath string
-	if uri, err := url.ParseRequestURI(c.Request().Referer()); err == nil {
-		basePath = trimSuffixSlash(uri.Path, docPath)
-		swagger.Host = uri.Host
-	} else {
-		basePath = trimSuffixSlash(c.Request().URL.Path, connectPath(docPath, SpecName))
-		swagger.Host = c.Request().Host
-	}
-	swagger.BasePath = connectPath(basePath)
-	return swagger, nil
+	return *r.spec, nil
 }
 
 func (r *Root) genSpec(c echo.Context) error {

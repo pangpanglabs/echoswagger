@@ -20,7 +20,7 @@ func TestSpec(t *testing.T) {
 		req := httptest.NewRequest(echo.GET, "/doc/swagger.json", nil)
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
-		j := `{"swagger":"2.0","info":{"title":"Project APIs","version":""},"host":"example.com","basePath":"/","paths":{}}`
+		j := `{"swagger":"2.0","info":{"title":"Project APIs","version":""},"host":"example.com","paths":{}}`
 		if assert.NoError(t, r.(*Root).specHandler("/doc/")(c)) {
 			assert.Equal(t, http.StatusOK, rec.Code)
 			assert.JSONEq(t, j, rec.Body.String())
@@ -33,7 +33,22 @@ func TestSpec(t *testing.T) {
 		req := httptest.NewRequest(echo.GET, "/doc/swagger.json", nil)
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
-		j := `{"swagger":"2.0","info":{"title":"Project APIs","version":""},"host":"example.com","basePath":"/","paths":{}}`
+		j := `{"swagger":"2.0","info":{"title":"Project APIs","version":""},"paths":{}}`
+		s, err := r.(*Root).GetSpec(c, "/doc/")
+		assert.Nil(t, err)
+		rs, err := json.Marshal(s)
+		assert.Nil(t, err)
+		assert.JSONEq(t, j, string(rs))
+	})
+
+	t.Run("BasicIntegrated", func(t *testing.T) {
+		r := prepareApiRoot()
+		r.SetUI(UISetting{DetachSpec: false})
+		e := r.(*Root).echo
+		req := httptest.NewRequest(echo.GET, "/doc", nil)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		j := `{"swagger":"2.0","info":{"title":"Project APIs","version":""},"paths":{}}`
 		s, err := r.(*Root).GetSpec(c, "/doc/")
 		assert.Nil(t, err)
 		rs, err := json.Marshal(s)
@@ -83,7 +98,7 @@ func TestSpec(t *testing.T) {
 		req := httptest.NewRequest(echo.GET, "/doc/swagger.json", nil)
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
-		j := `{"swagger":"2.0","info":{"title":"Project APIs","version":""},"host":"example.com","basePath":"/","paths":{"/ping":{"get":{"responses":{"default":{"description":"successful operation"}}}},"/users/{id}":{"delete":{"tags":["Users"],"responses":{"default":{"description":"successful operation"}}}}},"tags":[{"name":"Users"}]}`
+		j := `{"swagger":"2.0","info":{"title":"Project APIs","version":""},"host":"example.com","paths":{"/ping":{"get":{"responses":{"default":{"description":"successful operation"}}}},"/users/{id}":{"delete":{"tags":["Users"],"responses":{"default":{"description":"successful operation"}}}}},"tags":[{"name":"Users"}]}`
 		if assert.NoError(t, r.(*Root).specHandler("/doc")(c)) {
 			assert.Equal(t, http.StatusOK, rec.Code)
 			assert.JSONEq(t, j, rec.Body.String())
@@ -105,21 +120,21 @@ func TestReferer(t *testing.T) {
 			host:     "localhost:1323",
 			docPath:  "/doc",
 			name:     "A",
-			basePath: "/",
+			basePath: "",
 		},
 		{
 			referer:  "http://localhost:1323/doc",
 			host:     "localhost:1323",
 			docPath:  "/doc/",
 			name:     "B",
-			basePath: "/",
+			basePath: "",
 		},
 		{
 			referer:  "http://localhost:1323/doc/",
 			host:     "localhost:1323",
 			docPath:  "/doc",
 			name:     "C",
-			basePath: "/",
+			basePath: "",
 		},
 		{
 			referer:  "http://localhost:1323/api/v1/doc",
@@ -133,14 +148,14 @@ func TestReferer(t *testing.T) {
 			host:     "127.0.0.1",
 			docPath:  "/doc",
 			name:     "E",
-			basePath: "/",
+			basePath: "",
 		},
 		{
 			referer:  "http://user:pass@github.com",
 			host:     "github.com",
 			docPath:  "/",
 			name:     "F",
-			basePath: "/",
+			basePath: "",
 		},
 		{
 			referer:  "https://www.github.com/v1/docs/?q=1",
@@ -154,7 +169,7 @@ func TestReferer(t *testing.T) {
 			host:     "www.github.com",
 			docPath:  "",
 			name:     "H",
-			basePath: "/",
+			basePath: "",
 		},
 		{
 			referer:  "https://www.github.com/",

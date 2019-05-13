@@ -12,7 +12,9 @@ import (
 )
 
 func prepareApiRoot() ApiRoot {
-	return New(echo.New(), "doc/", nil)
+	r := New(echo.New(), "doc/", nil)
+	r.SetUI(UISetting{DetachSpec: true})
+	return r
 }
 
 func prepareApiGroup() ApiGroup {
