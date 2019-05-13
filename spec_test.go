@@ -21,10 +21,24 @@ func TestSpec(t *testing.T) {
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 		j := `{"swagger":"2.0","info":{"title":"Project APIs","version":""},"host":"example.com","basePath":"/","paths":{}}`
-		if assert.NoError(t, r.(*Root).SpecHandler("/doc/")(c)) {
+		if assert.NoError(t, r.(*Root).specHandler("/doc/")(c)) {
 			assert.Equal(t, http.StatusOK, rec.Code)
 			assert.JSONEq(t, j, rec.Body.String())
 		}
+	})
+
+	t.Run("BasicGenerater", func(t *testing.T) {
+		r := prepareApiRoot()
+		e := r.(*Root).echo
+		req := httptest.NewRequest(echo.GET, "/doc/swagger.json", nil)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		j := `{"swagger":"2.0","info":{"title":"Project APIs","version":""},"host":"example.com","basePath":"/","paths":{}}`
+		s, err := r.(*Root).GetSpec(c, "/doc/")
+		assert.Nil(t, err)
+		rs, err := json.Marshal(s)
+		assert.Nil(t, err)
+		assert.JSONEq(t, j, string(rs))
 	})
 
 	t.Run("Methods", func(t *testing.T) {
@@ -41,7 +55,7 @@ func TestSpec(t *testing.T) {
 		req := httptest.NewRequest(echo.GET, "/doc/swagger.json", nil)
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
-		if assert.NoError(t, r.(*Root).SpecHandler("/doc")(c)) {
+		if assert.NoError(t, r.(*Root).specHandler("/doc")(c)) {
 			assert.Equal(t, http.StatusOK, rec.Code)
 			s := r.(*Root).spec
 			assert.Len(t, s.Paths, 1)
@@ -52,32 +66,6 @@ func TestSpec(t *testing.T) {
 			assert.NotNil(t, s.Paths["/"].(*Path).Options)
 			assert.NotNil(t, s.Paths["/"].(*Path).Head)
 			assert.NotNil(t, s.Paths["/"].(*Path).Patch)
-		}
-	})
-
-	t.Run("ErrorGroupSecurity", func(t *testing.T) {
-		r := prepareApiRoot()
-		e := r.(*Root).echo
-		var h echo.HandlerFunc
-		r.Group("G", "/g").SetSecurity("JWT").GET("/", h)
-		req := httptest.NewRequest(echo.GET, "/doc/swagger.json", nil)
-		rec := httptest.NewRecorder()
-		c := e.NewContext(req, rec)
-		if assert.NoError(t, r.(*Root).SpecHandler("/doc")(c)) {
-			assert.Equal(t, http.StatusInternalServerError, rec.Code)
-		}
-	})
-
-	t.Run("ErrorApiSecurity", func(t *testing.T) {
-		r := prepareApiRoot()
-		e := r.(*Root).echo
-		var h echo.HandlerFunc
-		r.GET("/", h).SetSecurity("JWT")
-		req := httptest.NewRequest(echo.GET, "/doc/swagger.json", nil)
-		rec := httptest.NewRecorder()
-		c := e.NewContext(req, rec)
-		if assert.NoError(t, r.(*Root).SpecHandler("/doc")(c)) {
-			assert.Equal(t, http.StatusInternalServerError, rec.Code)
 		}
 	})
 
@@ -96,7 +84,7 @@ func TestSpec(t *testing.T) {
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 		j := `{"swagger":"2.0","info":{"title":"Project APIs","version":""},"host":"example.com","basePath":"/","paths":{"/ping":{"get":{"responses":{"default":{"description":"successful operation"}}}},"/users/{id}":{"delete":{"tags":["Users"],"responses":{"default":{"description":"successful operation"}}}}},"tags":[{"name":"Users"}]}`
-		if assert.NoError(t, r.(*Root).SpecHandler("/doc")(c)) {
+		if assert.NoError(t, r.(*Root).specHandler("/doc")(c)) {
 			assert.Equal(t, http.StatusOK, rec.Code)
 			assert.JSONEq(t, j, rec.Body.String())
 		}
@@ -184,7 +172,7 @@ func TestReferer(t *testing.T) {
 			req.Header.Add("referer", tt.referer)
 			rec := httptest.NewRecorder()
 			c := e.NewContext(req, rec)
-			if assert.NoError(t, r.(*Root).SpecHandler(tt.docPath)(c)) {
+			if assert.NoError(t, r.(*Root).specHandler(tt.docPath)(c)) {
 				assert.Equal(t, http.StatusOK, rec.Code)
 				var v struct {
 					Host     string `json:"host"`
@@ -226,7 +214,7 @@ func TestAddDefinition(t *testing.T) {
 	req := httptest.NewRequest(echo.GET, "/doc/swagger.json", nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	if assert.NoError(t, r.(*Root).SpecHandler("/doc")(c)) {
+	if assert.NoError(t, r.(*Root).specHandler("/doc")(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 		assert.Len(t, r.(*Root).spec.Definitions, 2)
 	}

@@ -15,26 +15,36 @@ const (
 	SpecName       = "swagger.json"
 )
 
-func (r *Root) SpecHandler(docPath string) echo.HandlerFunc {
+func (r *Root) specHandler(docPath string) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		r.once.Do(func() {
-			r.err = r.genSpec(c)
-			r.cleanUp()
-		})
-		if r.err != nil {
-			return c.String(http.StatusInternalServerError, r.err.Error())
+		spec, err := r.GetSpec(c, docPath)
+		if err != nil {
+			return c.String(http.StatusInternalServerError, err.Error())
 		}
-		var basePath string
-		if uri, err := url.ParseRequestURI(c.Request().Referer()); err == nil {
-			basePath = trimSuffixSlash(uri.Path, docPath)
-			r.spec.Host = uri.Host
-		} else {
-			basePath = trimSuffixSlash(c.Request().URL.Path, connectPath(docPath, SpecName))
-			r.spec.Host = c.Request().Host
-		}
-		r.spec.BasePath = connectPath(basePath)
-		return c.JSON(http.StatusOK, r.spec)
+		return c.JSON(http.StatusOK, spec)
 	}
+}
+
+// Generate swagger spec data
+func (r *Root) GetSpec(c echo.Context, docPath string) (Swagger, error) {
+	r.once.Do(func() {
+		r.err = r.genSpec(c)
+		r.cleanUp()
+	})
+	if r.err != nil {
+		return Swagger{}, r.err
+	}
+	swagger := *r.spec
+	var basePath string
+	if uri, err := url.ParseRequestURI(c.Request().Referer()); err == nil {
+		basePath = trimSuffixSlash(uri.Path, docPath)
+		swagger.Host = uri.Host
+	} else {
+		basePath = trimSuffixSlash(c.Request().URL.Path, connectPath(docPath, SpecName))
+		swagger.Host = c.Request().Host
+	}
+	swagger.BasePath = connectPath(basePath)
+	return swagger, nil
 }
 
 func (r *Root) genSpec(c echo.Context) error {

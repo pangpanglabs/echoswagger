@@ -330,7 +330,7 @@ func TestUI(t *testing.T) {
 		req := httptest.NewRequest(echo.GET, "/doc/", nil)
 		rec := httptest.NewRecorder()
 		c := se.echo.NewContext(req, rec)
-		h := se.docHandler()
+		h := se.docHandler("doc/")
 
 		if assert.NoError(t, h(c)) {
 			assert.Equal(t, http.StatusOK, rec.Code)
@@ -344,7 +344,7 @@ func TestUI(t *testing.T) {
 		req := httptest.NewRequest(echo.GET, "/doc/", nil)
 		rec := httptest.NewRecorder()
 		c := se.echo.NewContext(req, rec)
-		h := se.docHandler()
+		h := se.docHandler("doc/")
 
 		cdn := "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.18.0"
 		r.SetUI(UISetting{
@@ -355,6 +355,17 @@ func TestUI(t *testing.T) {
 		if assert.NoError(t, h(c)) {
 			assert.Equal(t, http.StatusOK, rec.Code)
 			assert.Contains(t, rec.Body.String(), cdn)
+			assert.Contains(t, rec.Body.String(), `{\x22swagger\x22:`)
+			assert.Contains(t, rec.Body.String(), "#swagger-ui>.swagger-container>.topbar")
+		}
+
+		r.SetUI(UISetting{
+			DetachSpec: true,
+		})
+
+		if assert.NoError(t, h(c)) {
+			assert.Equal(t, http.StatusOK, rec.Code)
+			assert.NotContains(t, rec.Body.String(), "{\x22swagger\x22:")
 			assert.Contains(t, rec.Body.String(), "#swagger-ui>.swagger-container>.topbar")
 		}
 	})
@@ -473,4 +484,38 @@ func TestEcho(t *testing.T) {
 
 	a := prepareApi()
 	assert.NotNil(t, a.Route())
+}
+
+func TestHandlers(t *testing.T) {
+	t.Run("ErrorGroupSecurity", func(t *testing.T) {
+		r := prepareApiRoot()
+		e := r.(*Root).echo
+		var h echo.HandlerFunc
+		r.Group("G", "/g").SetSecurity("JWT").GET("/", h)
+		req := httptest.NewRequest(echo.GET, "/doc/swagger.json", nil)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		if assert.NoError(t, r.(*Root).specHandler("/doc")(c)) {
+			assert.Equal(t, http.StatusInternalServerError, rec.Code)
+		}
+		if assert.NoError(t, r.(*Root).docHandler("/doc")(c)) {
+			assert.Equal(t, http.StatusInternalServerError, rec.Code)
+		}
+	})
+
+	t.Run("ErrorApiSecurity", func(t *testing.T) {
+		r := prepareApiRoot()
+		e := r.(*Root).echo
+		var h echo.HandlerFunc
+		r.GET("/", h).SetSecurity("JWT")
+		req := httptest.NewRequest(echo.GET, "/doc/swagger.json", nil)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+		if assert.NoError(t, r.(*Root).specHandler("/doc")(c)) {
+			assert.Equal(t, http.StatusInternalServerError, rec.Code)
+		}
+		if assert.NoError(t, r.(*Root).docHandler("/doc")(c)) {
+			assert.Equal(t, http.StatusInternalServerError, rec.Code)
+		}
+	})
 }
