@@ -104,13 +104,7 @@ func (g *api) addParams(p interface{}, in ParamInType, name, desc string, requir
 	rt := indirectType(p)
 	st, sf := toSwaggerType(rt)
 	if st == "object" && sf == "object" {
-		for i := 0; i < rt.NumField(); i++ {
-			pm := Parameter{}.generate(rt.Field(i), in)
-			if pm != nil {
-				pm.Name = g.operation.rename(pm.Name)
-				g.operation.Parameters = append(g.operation.Parameters, pm)
-			}
-		}
+		g.operation.handleParamStruct(rt, in)
 	} else {
 		name = g.operation.rename(name)
 		pm := &Parameter{
@@ -160,4 +154,18 @@ func (o Operation) rename(s string) string {
 		}
 	}
 	return s
+}
+
+func (o *Operation) handleParamStruct(rt reflect.Type, in ParamInType) {
+	for i := 0; i < rt.NumField(); i++ {
+		if rt.Field(i).Type.Kind() == reflect.Struct && rt.Field(i).Anonymous {
+			o.handleParamStruct(rt.Field(i).Type, in)
+		} else {
+			pm := Parameter{}.generate(rt.Field(i), in)
+			if pm != nil {
+				pm.Name = o.rename(pm.Name)
+				o.Parameters = append(o.Parameters, pm)
+			}
+		}
+	}
 }

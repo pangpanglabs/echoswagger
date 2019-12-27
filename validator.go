@@ -41,7 +41,11 @@ func isValidParam(t reflect.Type, nest, inner bool) bool {
 			return true
 		} else if !inner {
 			for i := 0; i < t.NumField(); i++ {
-				if !isValidParam(t.Field(i).Type, nest, true) {
+				inner := true
+				if t.Field(i).Type.Kind() == reflect.Struct && t.Field(i).Anonymous {
+					inner = false
+				}
+				if !isValidParam(t.Field(i).Type, nest, inner) {
 					return false
 				}
 			}

@@ -34,7 +34,7 @@ func getSwaggerTags(field reflect.StructField) map[string]string {
 	return r
 }
 
-func getFieldName(f reflect.StructField, in ParamInType) string {
+func getFieldName(f reflect.StructField, in ParamInType) (string, bool) {
 	var name string
 	switch in {
 	case ParamInQuery:
@@ -45,9 +45,9 @@ func getFieldName(f reflect.StructField, in ParamInType) string {
 		_, name = getTag(f, "json", 0)
 	}
 	if name != "" {
-		return name
+		return name, true
 	} else {
-		return f.Name
+		return f.Name, false
 	}
 }
 

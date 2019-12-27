@@ -142,14 +142,31 @@ func (r *RawDefineDic) addDefinition(v reflect.Value) string {
 		Schema: schema,
 	}
 
+	r.handleStruct(v, schema)
+
+	if schema.XML == nil {
+		schema.XML = &XMLSchema{}
+	}
+	if schema.XML.Name == "" {
+		schema.XML.Name = v.Type().Name()
+	}
+	return key
+}
+
+// handleStruct handles fields of a struct
+func (r *RawDefineDic) handleStruct(v reflect.Value, schema *JSONSchema) {
 	for i := 0; i < v.NumField(); i++ {
 		f := v.Type().Field(i)
-		name := getFieldName(f, ParamInBody)
+		name, hasTag := getFieldName(f, ParamInBody)
 		if name == "-" {
 			continue
 		}
 		if f.Type == reflect.TypeOf(xml.Name{}) {
 			schema.handleXMLTags(f)
+			continue
+		}
+		if f.Type.Kind() == reflect.Struct && f.Anonymous && !hasTag {
+			r.handleStruct(v.Field(i), schema)
 			continue
 		}
 		sp := r.genSchema(v.Field(i))
@@ -161,12 +178,4 @@ func (r *RawDefineDic) addDefinition(v reflect.Value) string {
 
 		schema.handleSwaggerTags(f, name)
 	}
-
-	if schema.XML == nil {
-		schema.XML = &XMLSchema{}
-	}
-	if schema.XML.Name == "" {
-		schema.XML.Name = v.Type().Name()
-	}
-	return key
 }
