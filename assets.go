@@ -1,7 +1,7 @@
 package echoswagger
 
 // CDN refer to https://www.jsdelivr.com/package/npm/swagger-ui-dist
-const DefaultCDN = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@3.22.1"
+const DefaultCDN = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@3.24.3"
 
 const SwaggerUIContent = `{{define "swagger"}}
 <!DOCTYPE html>
@@ -9,7 +9,7 @@ const SwaggerUIContent = `{{define "swagger"}}
   <head>
     <meta charset="UTF-8">
     <title>{{.title}}</title>
-    <link rel="stylesheet" href="{{.cdn}}/swagger-ui.css" crossorigin="anonymous" />
+    <link rel="stylesheet" type="text/css" href="{{.cdn}}/swagger-ui.css" />
     <link rel="icon" type="image/png" href="{{.cdn}}/favicon-32x32.png" sizes="32x32" />
     <link rel="icon" type="image/png" href="{{.cdn}}/favicon-16x16.png" sizes="16x16" />
     <style>
