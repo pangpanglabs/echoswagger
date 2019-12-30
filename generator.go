@@ -19,7 +19,7 @@ func (Items) generate(t reflect.Type) *Items {
 }
 
 func (Parameter) generate(f reflect.StructField, in ParamInType) *Parameter {
-	name := getFieldName(f, in)
+	name, _ := getFieldName(f, in)
 	if name == "-" {
 		return nil
 	}
@@ -41,7 +41,7 @@ func (Parameter) generate(f reflect.StructField, in ParamInType) *Parameter {
 }
 
 func (Header) generate(f reflect.StructField) *Header {
-	name := getFieldName(f, ParamInHeader)
+	name, _ := getFieldName(f, ParamInHeader)
 	if name == "-" {
 		return nil
 	}
@@ -105,7 +105,7 @@ func (api) genHeader(v reflect.Value) map[string]*Header {
 		f := rt.Field(i)
 		h := Header{}.generate(f)
 		if h != nil {
-			name := getFieldName(f, ParamInHeader)
+			name, _ := getFieldName(f, ParamInHeader)
 			mh[name] = h
 		}
 	}
