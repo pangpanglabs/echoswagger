@@ -4,8 +4,8 @@
 [Echo](https://github.com/labstack/echo) 框架的 [Swagger UI](https://github.com/swagger-api/swagger-ui) 生成器
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/pangpanglabs/echoswagger)](https://goreportcard.com/report/github.com/pangpanglabs/echoswagger)
-[![Build Status](https://travis-ci.org/pangpanglabs/echoswagger.svg?branch=master)](https://travis-ci.org/pangpanglabs/echoswagger)
-[![codecov](https://codecov.io/gh/pangpanglabs/echoswagger/branch/master/graph/badge.svg)](https://codecov.io/gh/pangpanglabs/echoswagger)
+[![Build Status](https://travis-ci.org/pangpanglabs/echoswagger.svg?branch=v2)](https://travis-ci.org/pangpanglabs/echoswagger)
+[![codecov](https://codecov.io/gh/pangpanglabs/echoswagger/branch/v2/graph/badge.svg)](https://codecov.io/gh/pangpanglabs/echoswagger)
 
 ## 特性
 - 不依赖任何SwaggerUI的HTML/CSS文件

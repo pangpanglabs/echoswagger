@@ -4,8 +4,8 @@ English | [简体中文](./README_zh-CN.md)
 [Swagger UI](https://github.com/swagger-api/swagger-ui) generator for [Echo](https://github.com/labstack/echo) framework
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/pangpanglabs/echoswagger)](https://goreportcard.com/report/github.com/pangpanglabs/echoswagger)
-[![Build Status](https://travis-ci.org/pangpanglabs/echoswagger.svg?branch=master)](https://travis-ci.org/pangpanglabs/echoswagger)
-[![codecov](https://codecov.io/gh/pangpanglabs/echoswagger/branch/master/graph/badge.svg)](https://codecov.io/gh/pangpanglabs/echoswagger)
+[![Build Status](https://travis-ci.org/pangpanglabs/echoswagger.svg?branch=v2)](https://travis-ci.org/pangpanglabs/echoswagger)
+[![codecov](https://codecov.io/gh/pangpanglabs/echoswagger/branch/v2/graph/badge.svg)](https://codecov.io/gh/pangpanglabs/echoswagger)
 
 ## Feature
 - No SwaggerUI HTML/CSS dependency
