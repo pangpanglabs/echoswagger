@@ -18,6 +18,17 @@ English | [简体中文](./README_zh-CN.md)
 go get github.com/pangpanglabs/echoswagger
 ```
 
+## Go modules support
+If your project has migrated to Go modules, you can:
+- Choose v2 version of Echoswagger for Echo version v4.
+- Choose v1 version of Echoswagger for Echo version <= v3 .
+
+To use v2 version, just do:
+- `go get github.com/pangpanglabs/echoswagger/v2`
+- import `github.com/labstack/echo/v4` and `github.com/pangpanglabs/echoswagger/v2` in your project
+
+Meanwhile, v1 version will still be updated if needed. For more details of Go modules, please refer to [Go Wiki](https://github.com/golang/go/wiki/Modules).
+
 ## Example
 ```go
 package main
