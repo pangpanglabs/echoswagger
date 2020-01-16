@@ -18,6 +18,17 @@
 go get github.com/pangpanglabs/echoswagger
 ```
 
+## Go modules 支持
+如果你的项目已经使用Go modules，你可以:
+- 选择v2版本的Echoswagger搭配Echo v4版本
+- 选择v1版本的Echoswagger搭配Echo v3及以下版本
+
+使用v2版本，只需要:
+- `go get github.com/pangpanglabs/echoswagger/v2`
+- 在你的项目中import `github.com/labstack/echo/v4` 和 `github.com/pangpanglabs/echoswagger/v2`
+
+同时，v1版本将继续更新。关于Go modules的详细内容，请参考 [Go Wiki](https://github.com/golang/go/wiki/Modules)
+
 ## 示例
 ```go
 package main
