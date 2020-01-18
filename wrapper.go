@@ -21,8 +21,8 @@ Notice:
 
 type ApiRouter interface {
 
-	// ADD overrides `Echo#GET()` and creates Api.
-	ADD(method, path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api
+	// Add overrides `Echo#GET()` and creates Api.
+	Add(method, path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api
 
 	// GET overrides `Echo#GET()` and creates Api.
 	GET(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api
@@ -242,7 +242,7 @@ func New(e *echo.Echo, docPath string, i *Info) ApiRoot {
 	return r
 }
 
-func (r *Root) ADD(method, path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
+func (r *Root) Add(method, path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
 	return r.appendRoute(r.echo.Add(method, path, h, m...))
 }
 
@@ -390,7 +390,7 @@ func (r *Root) Echo() *echo.Echo {
 	return r.echo
 }
 
-func (g *group) ADD(method, path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
+func (g *group) Add(method, path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {
 	a := g.appendRoute(g.echoGroup.Add(method, path, h, m...))
 	a.operation.Tags = []string{g.tag.Name}
 	return a
