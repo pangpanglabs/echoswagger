@@ -144,10 +144,10 @@ func TestGroup(t *testing.T) {
 
 	t.Run("Repeat name", func(t *testing.T) {
 		ga := r.Group("Users", "users")
-		assert.Equal(t, ga.(*group).tag.Name, "Users_1")
+		assert.Equal(t, ga.(*group).tag.Name, "Users")
 
 		gb := r.Group("Users", "users")
-		assert.Equal(t, gb.(*group).tag.Name, "Users_2")
+		assert.Equal(t, gb.(*group).tag.Name, "Users")
 	})
 }
 
