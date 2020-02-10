@@ -277,18 +277,6 @@ func (r *Root) Group(name, prefix string, m ...echo.MiddlewareFunc) ApiGroup {
 			defs: r.defs,
 		},
 	}
-	var counter int
-LoopTags:
-	for _, t := range r.groups {
-		if t.tag.Name == name {
-			if counter > 0 {
-				name = name[:len(name)-2]
-			}
-			counter++
-			name += "_" + strconv.Itoa(counter)
-			goto LoopTags
-		}
-	}
 	group.tag = Tag{Name: name}
 	r.groups = append(r.groups, group)
 	return &r.groups[len(r.groups)-1]
