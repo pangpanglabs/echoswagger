@@ -21,7 +21,7 @@ Notice:
 
 type ApiRouter interface {
 
-	// Add overrides `Echo#GET()` and creates Api.
+	// Add overrides `Echo#Add()` and creates Api.
 	Add(method, path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api
 
 	// GET overrides `Echo#GET()` and creates Api.
