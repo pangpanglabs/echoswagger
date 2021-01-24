@@ -151,6 +151,32 @@ func TestGroup(t *testing.T) {
 	})
 }
 
+func TestBindGroup(t *testing.T) {
+	r := prepareApiRoot()
+	e := r.Echo()
+	apiGroup := e.Group("/api")
+
+	var h echo.HandlerFunc
+	t.Run("Include", func(t *testing.T) {
+		v1Group := apiGroup.Group("/v1")
+		g := r.BindGroup("APIv1", v1Group)
+		assert.Equal(t, g.(*group).tag.Name, "APIv1")
+
+		g.GET("/in", h)
+		assert.Len(t, g.(*group).apis, 1)
+		assert.Equal(t, g.(*group).apis[0].route.Path, "/api/v1/in")
+	})
+
+	t.Run("Exclude", func(t *testing.T) {
+		v2Group := apiGroup.Group("/v2")
+		g := r.BindGroup("APIv2", v2Group)
+		assert.Equal(t, g.(*group).tag.Name, "APIv2")
+
+		v2Group.GET("/ex", h)
+		assert.Len(t, g.(*group).apis, 0)
+	})
+}
+
 func TestRouters(t *testing.T) {
 	r := prepareApiRoot()
 	var h echo.HandlerFunc
