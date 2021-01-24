@@ -49,6 +49,12 @@ type ApiRouter interface {
 type ApiRoot interface {
 	ApiRouter
 
+	// Bind an existing Echo group
+	// note: this is usually used to create nested Echo groups
+	// you still need to add route by ApiGroup instance but not the param Echo group
+	// any routes created directly by the Echo group will not be added to the swagger spec.
+	BindGroup(name string, g *echo.Group) ApiGroup
+
 	// Group overrides `Echo#Group()` and creates ApiGroup.
 	Group(name, prefix string, m ...echo.MiddlewareFunc) ApiGroup
 
@@ -281,6 +287,21 @@ func (r *Root) Group(name, prefix string, m ...echo.MiddlewareFunc) ApiGroup {
 	echoGroup := r.echo.Group(prefix, m...)
 	group := group{
 		echoGroup: echoGroup,
+		routers: routers{
+			defs: r.defs,
+		},
+	}
+	group.tag = Tag{Name: name}
+	r.groups = append(r.groups, group)
+	return &r.groups[len(r.groups)-1]
+}
+
+func (r *Root) BindGroup(name string, g *echo.Group) ApiGroup {
+	if name == "" {
+		panic("echoswagger: invalid name of ApiGroup")
+	}
+	group := group{
+		echoGroup: g,
 		routers: routers{
 			defs: r.defs,
 		},
