@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo"
-	"github.com/lexholden/echoswagger"
+	"github.com/pangpanglabs/echoswagger"
 )
 
 type StoreController struct{}
