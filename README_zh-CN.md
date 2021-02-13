@@ -3,9 +3,9 @@
 # Echoswagger
 [Echo](https://github.com/labstack/echo) 框架的 [Swagger UI](https://github.com/swagger-api/swagger-ui) 生成器
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/pangpanglabs/echoswagger)](https://goreportcard.com/report/github.com/pangpanglabs/echoswagger)
-[![Build Status](https://travis-ci.org/pangpanglabs/echoswagger.svg?branch=master)](https://travis-ci.org/pangpanglabs/echoswagger)
-[![codecov](https://codecov.io/gh/pangpanglabs/echoswagger/branch/master/graph/badge.svg)](https://codecov.io/gh/pangpanglabs/echoswagger)
+[![Go Report Card](https://goreportcard.com/badge/github.com/lexholden/echoswagger)](https://goreportcard.com/report/github.com/lexholden/echoswagger)
+[![Build Status](https://travis-ci.org/lexholden/echoswagger.svg?branch=master)](https://travis-ci.org/lexholden/echoswagger)
+[![codecov](https://codecov.io/gh/lexholden/echoswagger/branch/master/graph/badge.svg)](https://codecov.io/gh/lexholden/echoswagger)
 
 ## 特性
 - 不依赖任何SwaggerUI的HTML/CSS文件
@@ -15,7 +15,7 @@
 
 ## 安装
 ```
-go get github.com/pangpanglabs/echoswagger
+go get github.com/lexholden/echoswagger
 ```
 
 ## Go modules 支持
@@ -24,8 +24,8 @@ go get github.com/pangpanglabs/echoswagger
 - 选择v1版本的Echoswagger搭配Echo v3及以下版本
 
 使用v2版本，只需要:
-- `go get github.com/pangpanglabs/echoswagger/v2`
-- 在你的项目中import `github.com/labstack/echo/v4` 和 `github.com/pangpanglabs/echoswagger/v2`
+- `go get github.com/lexholden/echoswagger/v2`
+- 在你的项目中import `github.com/labstack/echo/v4` 和 `github.com/lexholden/echoswagger/v2`
 
 同时，v1版本将继续更新。关于Go modules的详细内容，请参考 [Go Wiki](https://github.com/golang/go/wiki/Modules)
 
@@ -37,7 +37,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo"
-	"github.com/pangpanglabs/echoswagger"
+	"github.com/lexholden/echoswagger"
 )
 
 func main() {
@@ -237,4 +237,4 @@ default | * | 默认值，该类型与字段的类型相同。
 
 ## License
 
-[MIT](https://github.com/pangpanglabs/echoswagger/blob/master/LICENSE)
+[MIT](https://github.com/lexholden/echoswagger/blob/master/LICENSE)

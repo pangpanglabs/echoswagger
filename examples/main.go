@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/labstack/echo"
-	"github.com/pangpanglabs/echoswagger"
+	"github.com/lexholden/echoswagger"
 )
 
 func main() {

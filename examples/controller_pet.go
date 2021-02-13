@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo"
-	"github.com/pangpanglabs/echoswagger"
+	"github.com/lexholden/echoswagger"
 )
 
 type PetController struct{}

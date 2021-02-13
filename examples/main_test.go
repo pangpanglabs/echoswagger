@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/labstack/echo"
-	"github.com/pangpanglabs/echoswagger"
+	"github.com/lexholden/echoswagger"
 	"github.com/stretchr/testify/assert"
 )
 

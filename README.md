@@ -3,9 +3,9 @@ English | [简体中文](./README_zh-CN.md)
 # Echoswagger
 [Swagger UI](https://github.com/swagger-api/swagger-ui) generator for [Echo](https://github.com/labstack/echo) framework
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/pangpanglabs/echoswagger)](https://goreportcard.com/report/github.com/pangpanglabs/echoswagger)
-[![Build Status](https://travis-ci.org/pangpanglabs/echoswagger.svg?branch=master)](https://travis-ci.org/pangpanglabs/echoswagger)
-[![codecov](https://codecov.io/gh/pangpanglabs/echoswagger/branch/master/graph/badge.svg)](https://codecov.io/gh/pangpanglabs/echoswagger)
+[![Go Report Card](https://goreportcard.com/badge/github.com/lexholden/echoswagger)](https://goreportcard.com/report/github.com/lexholden/echoswagger)
+[![Build Status](https://travis-ci.org/lexholden/echoswagger.svg?branch=master)](https://travis-ci.org/lexholden/echoswagger)
+[![codecov](https://codecov.io/gh/lexholden/echoswagger/branch/master/graph/badge.svg)](https://codecov.io/gh/lexholden/echoswagger)
 
 ## Feature
 - No SwaggerUI HTML/CSS dependency
@@ -15,7 +15,7 @@ English | [简体中文](./README_zh-CN.md)
 
 ## Installation
 ```
-go get github.com/pangpanglabs/echoswagger
+go get github.com/lexholden/echoswagger
 ```
 
 ## Go modules support
@@ -24,8 +24,8 @@ If your project has migrated to Go modules, you can:
 - Choose v1 version of Echoswagger for Echo version <= v3 .
 
 To use v2 version, just do:
-- `go get github.com/pangpanglabs/echoswagger/v2`
-- import `github.com/labstack/echo/v4` and `github.com/pangpanglabs/echoswagger/v2` in your project
+- `go get github.com/lexholden/echoswagger/v2`
+- import `github.com/labstack/echo/v4` and `github.com/lexholden/echoswagger/v2` in your project
 
 Meanwhile, v1 version will still be updated if needed. For more details of Go modules, please refer to [Go Wiki](https://github.com/golang/go/wiki/Modules).
 
@@ -37,7 +37,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo"
-	"github.com/pangpanglabs/echoswagger"
+	"github.com/lexholden/echoswagger"
 )
 
 func main() {
@@ -237,4 +237,4 @@ default | * | Default value, which type is same as the field's type.
 
 ## License
 
-[MIT](https://github.com/pangpanglabs/echoswagger/blob/master/LICENSE)
+[MIT](https://github.com/lexholden/echoswagger/blob/master/LICENSE)
