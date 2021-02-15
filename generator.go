@@ -78,9 +78,17 @@ func (r *RawDefineDic) genSchema(v reflect.Value) *JSONSchema {
 		if v.Len() == 0 {
 			v = reflect.New(v.Type().Elem())
 		} else {
-			v = v.MapIndex(v.MapKeys()[0])
+			m, ok := v.Interface().(map[string]interface{})
+			if ok {
+				schema.Properties = make(map[string]*JSONSchema)
+				for k, kv := range m {
+					schema.Properties[k] = r.genSchema(reflect.ValueOf(kv))
+				}
+			} else {
+				v = v.MapIndex(v.MapKeys()[0])
+				schema.AdditionalProperties = r.genSchema(v)
+			}
 		}
-		schema.AdditionalProperties = r.genSchema(v)
 	} else if st == "object" {
 		key := r.addDefinition(v)
 		schema.Ref = DefPrefix + key

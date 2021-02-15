@@ -112,6 +112,9 @@ type ApiGroup interface {
 	// Should only use when Security type is oauth2.
 	SetSecurityWithScope(s map[string][]string) ApiGroup
 
+	// AddParam adds a param useable by the whole group
+	AddParam(p interface{}, in ParamInType, name, desc string, required, nest bool) ApiGroup
+
 	// EchoGroup returns the embedded `echo.Group` instance.
 	EchoGroup() *echo.Group
 }
@@ -187,6 +190,8 @@ type Api interface {
 
 	// Route returns the embedded `echo.Route` instance.
 	Route() *echo.Route
+
+	GetSchema() Operation
 }
 
 type routers struct {
@@ -206,9 +211,10 @@ type Root struct {
 
 type group struct {
 	routers
-	echoGroup *echo.Group
-	security  []map[string][]string
-	tag       Tag
+	echoGroup  *echo.Group
+	security   []map[string][]string
+	tag        Tag
+	parameters []*Parameter
 }
 
 type api struct {
@@ -397,6 +403,11 @@ func (r *Root) SetRaw(s *Swagger) ApiRoot {
 
 func (r *Root) Echo() *echo.Echo {
 	return r.echo
+}
+
+func (g *group) AddParam(p interface{}, in ParamInType, name, desc string, required, nest bool) ApiGroup {
+	g.parameters = append(g.parameters, createParameter(p, in, name, desc, required, nest))
+	return g
 }
 
 func (g *group) Add(method, path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) Api {

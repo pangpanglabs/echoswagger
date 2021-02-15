@@ -58,14 +58,14 @@ func (r *Root) genSpec(c echo.Context) error {
 			if err := a.operation.addSecurity(r.spec.SecurityDefinitions, group.security); err != nil {
 				return err
 			}
-			if err := r.transfer(a); err != nil {
+			if err := r.transfer(a, group); err != nil {
 				return err
 			}
 		}
 	}
 
 	for i := range r.apis {
-		if err := r.transfer(&r.apis[i]); err != nil {
+		if err := r.transfer(&r.apis[i], nil); err != nil {
 			return err
 		}
 	}
@@ -76,7 +76,7 @@ func (r *Root) genSpec(c echo.Context) error {
 	return nil
 }
 
-func (r *Root) transfer(a *api) error {
+func (r *Root) transfer(a *api, g *group) error {
 	if err := a.operation.addSecurity(r.spec.SecurityDefinitions, a.security); err != nil {
 		return err
 	}
@@ -94,6 +94,10 @@ func (r *Root) transfer(a *api) error {
 		p := &Path{}
 		p.oprationAssign(a.route.Method, &a.operation)
 		r.spec.Paths[path] = p
+
+		if g != nil && len(g.parameters) != 0 {
+			p.Parameters = g.parameters
+		}
 	}
 	return nil
 }

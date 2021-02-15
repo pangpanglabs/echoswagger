@@ -97,16 +97,16 @@ func (r *routers) appendRoute(route *echo.Route) *api {
 	return &r.apis[len(r.apis)-1]
 }
 
-func (g *api) addParams(p interface{}, in ParamInType, name, desc string, required, nest bool) Api {
+func createParameter(p interface{}, in ParamInType, name, desc string, required, nest bool) *Parameter {
 	if !isValidParam(reflect.TypeOf(p), nest, false) {
 		panic("echoswagger: invalid " + string(in) + " param")
 	}
 	rt := indirectType(p)
 	st, sf := toSwaggerType(rt)
+
 	if st == "object" && sf == "object" {
-		g.operation.handleParamStruct(rt, in)
+		return nil
 	} else {
-		name = g.operation.rename(name)
 		pm := &Parameter{
 			Name:        name,
 			In:          string(in),
@@ -120,6 +120,17 @@ func (g *api) addParams(p interface{}, in ParamInType, name, desc string, requir
 		} else {
 			pm.Format = sf
 		}
+		return pm
+	}
+}
+
+func (g *api) addParams(p interface{}, in ParamInType, name, desc string, required, nest bool) Api {
+	pm := createParameter(p, in, name, desc, required, nest)
+	if pm == nil {
+		rt := indirectType(p)
+		g.operation.handleParamStruct(rt, in)
+	} else {
+		name = g.operation.rename(name)
 		g.operation.Parameters = append(g.operation.Parameters, pm)
 	}
 	return g
@@ -145,6 +156,10 @@ func (g *api) addBodyParams(p interface{}, name, desc string, required bool) Api
 	}
 	g.operation.Parameters = append(g.operation.Parameters, pm)
 	return g
+}
+
+func (g *api) GetSchema() Operation {
+	return g.operation
 }
 
 func (o Operation) rename(s string) string {
