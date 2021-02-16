@@ -9,8 +9,8 @@ github.com/mattn/go-colorable v0.1.2/go.mod h1:U0ppj6V5qS13XJ6of8GYAs25YV2eR4EVc
 github.com/mattn/go-isatty v0.0.8/go.mod h1:Iq45c/XA43vh69/j3iqttzPXn0bhXyGjM0Hdxcsrc5s=
 github.com/mattn/go-isatty v0.0.9 h1:d5US/mDsogSGW37IV293h//ZFaeajb69h+EHFsv2xGg=
 github.com/mattn/go-isatty v0.0.9/go.mod h1:YNRxwqDuOph6SZLI9vUUz6OYw3QyUt7WiY2yME+cCiQ=
-github.com/lexholden/echoswagger v1.2.0 h1:bE+0yMUmuXfsTDxEeYKLz4y9032rdSH+CDz2iYVW4g8=
-github.com/lexholden/echoswagger v1.2.0/go.mod h1:4LFAmXLr59RKRsgLNPxgoDIKqakWSWGRs0TtIDqkdkQ=
+github.com/lexholden/echoswagger v1.2.1 h1:bE+0yMUmuXfsTDxEeYKLz4y9032rdSH+CDz2iYVW4g8=
+github.com/lexholden/echoswagger v1.2.1/go.mod h1:4LFAmXLr59RKRsgLNPxgoDIKqakWSWGRs0TtIDqkdkQ=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
