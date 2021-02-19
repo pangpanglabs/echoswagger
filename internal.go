@@ -76,11 +76,11 @@ func (r *RawDefineDic) getKey(v reflect.Value) (bool, string) {
 		}
 	}
 	name := v.Type().Name()
-	for k := range *r {
-		if name == k {
-			name += "_"
-		}
-	}
+	// for k := range *r {
+	// 	if name == k {
+	// 		name += "_"
+	// 	}
+	// }
 	return false, name
 }
 

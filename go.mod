@@ -5,7 +5,7 @@ go 1.12
 require (
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.3.0 // indirect
-	github.com/lexholden/echoswagger v1.2.3
+	github.com/lexholden/echoswagger v1.2.4
 	github.com/stretchr/testify v1.4.0
 	golang.org/x/crypto v0.0.0-20191219195013-becbf705a915 // indirect
 )

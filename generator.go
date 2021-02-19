@@ -71,8 +71,11 @@ func (r *RawDefineDic) genSchema(v reflect.Value) *JSONSchema {
 		schema.Type = JSONType(st)
 		if v.Len() == 0 {
 			v = reflect.MakeSlice(v.Type(), 1, 1)
+			schema.Items = r.genSchema(v.Index(0))
+		} else {
+			vv := v.Index(0).Interface()
+			schema.Items = r.genSchema(reflect.ValueOf(vv))
 		}
-		schema.Items = r.genSchema(v.Index(0))
 	} else if st == "object" && sf == "map" {
 		schema.Type = JSONType(st)
 		if v.Len() == 0 {
