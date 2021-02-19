@@ -91,6 +91,8 @@ type ApiRoot interface {
 
 	// Echo returns the embedded Echo instance
 	Echo() *echo.Echo
+
+	GetSpec(c echo.Context, docPath string) (Swagger, error)
 }
 
 type ApiGroup interface {

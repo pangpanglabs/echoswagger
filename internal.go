@@ -117,7 +117,7 @@ func createParameter(p interface{}, in ParamInType, name, desc string, required,
 		if st == "array" {
 			pm.Items = Items{}.generate(rt.Elem())
 			pm.CollectionFormat = "multi"
-		} else {
+		} else if st != sf {
 			pm.Format = sf
 		}
 		return pm

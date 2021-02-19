@@ -12,7 +12,7 @@ func (Items) generate(t reflect.Type) *Items {
 	if st == "array" {
 		item.Items = Items{}.generate(t.Elem())
 		item.CollectionFormat = "multi"
-	} else {
+	} else if st != sf {
 		item.Format = sf
 	}
 	return item
@@ -32,7 +32,7 @@ func (Parameter) generate(f reflect.StructField, in ParamInType) *Parameter {
 	if st == "array" {
 		pm.Items = Items{}.generate(f.Type.Elem())
 		pm.CollectionFormat = "multi"
-	} else {
+	} else if st != sf {
 		pm.Format = sf
 	}
 
@@ -52,7 +52,7 @@ func (Header) generate(f reflect.StructField) *Header {
 	if st == "array" {
 		h.Items = Items{}.generate(f.Type.Elem())
 		h.CollectionFormat = "multi"
-	} else {
+	} else if st != sf {
 		h.Format = sf
 	}
 
@@ -94,7 +94,9 @@ func (r *RawDefineDic) genSchema(v reflect.Value) *JSONSchema {
 		schema.Ref = DefPrefix + key
 	} else {
 		schema.Type = JSONType(st)
-		schema.Format = sf
+		if st != sf {
+			schema.Format = sf
+		}
 		zv := reflect.Zero(v.Type())
 		if v.CanInterface() && zv.CanInterface() && v.Interface() != zv.Interface() {
 			schema.Example = v.Interface()

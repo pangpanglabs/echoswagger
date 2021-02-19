@@ -278,59 +278,59 @@ func (s *JSONSchema) latest() *JSONSchema {
 // Not support embedded structure with tag ",innerxml"
 // Only support nested elements tag in array type eg:"Name []string `xml:"names>name"`"
 func (s *JSONSchema) handleXMLTags(f reflect.StructField) {
-	b, a := getTag(f, "xml", 1)
-	if b && contains([]string{"chardata", "cdata", "comment"}, a) {
-		return
-	}
+	// b, a := getTag(f, "xml", 1)
+	// if b && contains([]string{"chardata", "cdata", "comment"}, a) {
+	// 	return
+	// }
 
-	if b, t := getTag(f, "xml", 0); b {
-		if t == "-" || s.Ref != "" {
-			return
-		} else if t == "" {
-			t = f.Name
-		}
+	// if b, t := getTag(f, "xml", 0); b {
+	// 	if t == "-" || s.Ref != "" {
+	// 		return
+	// 	} else if t == "" {
+	// 		t = f.Name
+	// 	}
 
-		if s.XML == nil {
-			s.XML = &XMLSchema{}
-		}
-		if a == "attr" {
-			s.XML.Attribute = t
-		} else {
-			s.XML.Name = t
-		}
-	}
+	// 	if s.XML == nil {
+	// 		s.XML = &XMLSchema{}
+	// 	}
+	// 	if a == "attr" {
+	// 		s.XML.Attribute = t
+	// 	} else {
+	// 		s.XML.Name = t
+	// 	}
+	// }
 }
 
 func (s *JSONSchema) handleChildXMLTags(rest string, r *RawDefineDic) {
-	if rest == "" {
-		return
-	}
+	// if rest == "" {
+	// 	return
+	// }
 
-	if s.Items == nil && s.Ref == "" {
-		if s.XML == nil {
-			s.XML = &XMLSchema{}
-		}
-		s.XML.Name = rest
-	} else if s.Ref != "" {
-		key := s.Ref[len(DefPrefix):]
-		if sc, ok := (*r)[key]; ok && sc.Schema != nil {
-			if sc.Schema.XML == nil {
-				sc.Schema.XML = &XMLSchema{}
-			}
-			sc.Schema.XML.Name = rest
-		}
-	} else {
-		if s.XML == nil {
-			s.XML = &XMLSchema{}
-		}
-		s.XML.Wrapped = true
-		i := strings.Index(rest, ">")
-		if i <= 0 {
-			s.XML.Name = rest
-		} else {
-			s.XML.Name = rest[:i]
-			rest = rest[i+1:]
-			s.Items.handleChildXMLTags(rest, r)
-		}
-	}
+	// if s.Items == nil && s.Ref == "" {
+	// 	if s.XML == nil {
+	// 		s.XML = &XMLSchema{}
+	// 	}
+	// 	s.XML.Name = rest
+	// } else if s.Ref != "" {
+	// 	key := s.Ref[len(DefPrefix):]
+	// 	if sc, ok := (*r)[key]; ok && sc.Schema != nil {
+	// 		if sc.Schema.XML == nil {
+	// 			sc.Schema.XML = &XMLSchema{}
+	// 		}
+	// 		sc.Schema.XML.Name = rest
+	// 	}
+	// } else {
+	// 	if s.XML == nil {
+	// 		s.XML = &XMLSchema{}
+	// 	}
+	// 	s.XML.Wrapped = true
+	// 	i := strings.Index(rest, ">")
+	// 	if i <= 0 {
+	// 		s.XML.Name = rest
+	// 	} else {
+	// 		s.XML.Name = rest[:i]
+	// 		rest = rest[i+1:]
+	// 		s.Items.handleChildXMLTags(rest, r)
+	// 	}
+	// }
 }

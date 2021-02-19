@@ -1,7 +1,6 @@
 package echoswagger
 
 import (
-	"encoding/xml"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -148,12 +147,12 @@ func (r *RawDefineDic) addDefinition(v reflect.Value) string {
 
 	r.handleStruct(v, schema)
 
-	if schema.XML == nil {
-		schema.XML = &XMLSchema{}
-	}
-	if schema.XML.Name == "" {
-		schema.XML.Name = v.Type().Name()
-	}
+	// if schema.XML == nil {
+	// 	schema.XML = &XMLSchema{}
+	// }
+	// if schema.XML.Name == "" {
+	// 	schema.XML.Name = v.Type().Name()
+	// }
 	return key
 }
 
@@ -165,19 +164,19 @@ func (r *RawDefineDic) handleStruct(v reflect.Value, schema *JSONSchema) {
 		if name == "-" {
 			continue
 		}
-		if f.Type == reflect.TypeOf(xml.Name{}) {
-			schema.handleXMLTags(f)
-			continue
-		}
+		// if f.Type == reflect.TypeOf(xml.Name{}) {
+		// 	schema.handleXMLTags(f)
+		// 	continue
+		// }
 		if f.Type.Kind() == reflect.Struct && f.Anonymous && !hasTag {
 			r.handleStruct(v.Field(i), schema)
 			continue
 		}
 		sp := r.genSchema(v.Field(i))
-		sp.handleXMLTags(f)
-		if sp.XML != nil {
-			sp.handleChildXMLTags(sp.XML.Name, r)
-		}
+		// sp.handleXMLTags(f)
+		// if sp.XML != nil {
+		// 	sp.handleChildXMLTags(sp.XML.Name, r)
+		// }
 		schema.Properties[name] = sp
 
 		schema.handleSwaggerTags(f, name)
