@@ -88,10 +88,10 @@ func (r *Root) transfer(a *api, g *group) error {
 	}
 
 	if p, ok := r.spec.Paths[path]; ok {
-		p.(*Path).oprationAssign(a.route.Method, &a.operation)
+		p.(*Path).oprationAssign(a.route.Method, a.operation)
 	} else {
 		p := &Path{}
-		p.oprationAssign(a.route.Method, &a.operation)
+		p.oprationAssign(a.route.Method, a.operation)
 		r.spec.Paths[path] = p
 
 		if g != nil && len(g.parameters) != 0 {

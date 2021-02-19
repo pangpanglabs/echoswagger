@@ -193,7 +193,7 @@ type Api interface {
 	// Route returns the embedded `echo.Route` instance.
 	Route() *echo.Route
 
-	GetSchema() Operation
+	GetSchema() *Operation
 }
 
 type routers struct {
@@ -223,7 +223,7 @@ type api struct {
 	route     *echo.Route
 	defs      *RawDefineDic
 	security  []map[string][]string
-	operation Operation
+	operation *Operation
 }
 
 // New creates ApiRoot instance.

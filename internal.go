@@ -91,7 +91,7 @@ func (r *routers) appendRoute(route *echo.Route) *api {
 	a := api{
 		route:     route,
 		defs:      r.defs,
-		operation: opr,
+		operation: &opr,
 	}
 	r.apis = append(r.apis, a)
 	return &r.apis[len(r.apis)-1]
@@ -158,11 +158,11 @@ func (g *api) addBodyParams(p interface{}, name, desc string, required bool) Api
 	return g
 }
 
-func (g *api) GetSchema() Operation {
+func (g *api) GetSchema() *Operation {
 	return g.operation
 }
 
-func (o Operation) rename(s string) string {
+func (o *Operation) rename(s string) string {
 	for _, p := range o.Parameters {
 		if p.Name == s {
 			return o.rename(s + "_")
