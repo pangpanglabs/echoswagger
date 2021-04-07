@@ -220,7 +220,7 @@ type api struct {
 
 // New creates ApiRoot instance.
 // Multiple ApiRoot are allowed in one project.
-func New(e *echo.Echo, docPath string, i *Info) ApiRoot {
+func New(e *echo.Echo, docPath string, i *Info, m ...echo.MiddlewareFunc) ApiRoot {
 	if e == nil {
 		panic("echoswagger: invalid Echo instance")
 	}
@@ -243,8 +243,8 @@ func New(e *echo.Echo, docPath string, i *Info) ApiRoot {
 		},
 	}
 
-	e.GET(connectPath(docPath), r.docHandler(docPath))
-	e.GET(connectPath(docPath, SpecName), r.specHandler(docPath))
+	e.GET(connectPath(docPath), r.docHandler(docPath), m...)
+	e.GET(connectPath(docPath, SpecName), r.specHandler(docPath), m...)
 	return r
 }
 
