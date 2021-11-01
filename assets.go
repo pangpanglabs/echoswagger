@@ -1,7 +1,7 @@
 package echoswagger
 
 // CDN refer to https://www.jsdelivr.com/package/npm/swagger-ui-dist
-const DefaultCDN = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@3.44.1"
+const DefaultCDN = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@3.52.5"
 
 const SwaggerUIContent = `{{define "swagger"}}
 <!DOCTYPE html>
@@ -43,8 +43,8 @@ const SwaggerUIContent = `{{define "swagger"}}
   <body>
     <div id="swagger-ui"></div>
 
-    <script src="{{.cdn}}/swagger-ui-bundle.js" crossorigin="anonymous"></script>
-    <script src="{{.cdn}}/swagger-ui-standalone-preset.js" crossorigin="anonymous"></script>
+    <script src="{{.cdn}}/swagger-ui-bundle.js" charset="UTF-8" crossorigin="anonymous"></script>
+    <script src="{{.cdn}}/swagger-ui-standalone-preset.js" charset="UTF-8" crossorigin="anonymous"></script>
     <script>
     window.onload = function() {
       var specPath = "{{.specName}}"
@@ -78,11 +78,11 @@ const SwaggerUIContent = `{{define "swagger"}}
           SwaggerUIBundle.plugins.DownloadUrl
         ],
         layout: "StandaloneLayout"
-      })
+      });
       // End Swagger UI call region
 
-      window.ui = ui
-    }
+      window.ui = ui;
+    };
   </script>
   </body>
 </html>
