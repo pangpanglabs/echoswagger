@@ -24,17 +24,17 @@ func TestSecurity(t *testing.T) {
 	spec := r.(*Root).spec
 	assert.Len(t, spec.SecurityDefinitions, 3)
 	assert.Equal(t, spec.SecurityDefinitions, map[string]*SecurityDefinition{
-		"JWT": &SecurityDefinition{
+		"JWT": {
 			Type:        "apiKey",
 			Description: "JWT Token",
 			Name:        "JWT",
 			In:          string(SecurityInQuery),
 		},
-		"Basic": &SecurityDefinition{
+		"Basic": {
 			Type:        "basic",
 			Description: "Basic Auth",
 		},
-		"OAuth2": &SecurityDefinition{
+		"OAuth2": {
 			Type:             "oauth2",
 			Description:      "OAuth2 Auth",
 			Flow:             string(OAuth2FlowAccessCode),
@@ -53,16 +53,16 @@ func TestSecurity(t *testing.T) {
 		assert.Len(t, a.(*api).security, 1)
 		assert.Len(t, a.(*api).security[0], 2)
 		assert.Equal(t, a.(*api).security[0], map[string][]string{
-			"JWT":   []string{},
-			"Basic": []string{},
+			"JWT":   {},
+			"Basic": {},
 		})
 
 		g.SetSecurity("JWT", "Basic")
 		assert.Len(t, g.(*group).security, 1)
 		assert.Len(t, g.(*group).security[0], 2)
 		assert.Equal(t, g.(*group).security[0], map[string][]string{
-			"JWT":   []string{},
-			"Basic": []string{},
+			"JWT":   {},
+			"Basic": {},
 		})
 	})
 
@@ -76,11 +76,11 @@ func TestSecurity(t *testing.T) {
 		assert.Len(t, a.(*api).security, 2)
 		assert.Len(t, a.(*api).security[0], 1)
 		assert.Equal(t, a.(*api).security[0], map[string][]string{
-			"JWT": []string{},
+			"JWT": {},
 		})
 		assert.Len(t, a.(*api).security[1], 1)
 		assert.Equal(t, a.(*api).security[1], map[string][]string{
-			"Basic": []string{},
+			"Basic": {},
 		})
 
 		g.SetSecurity("JWT")
@@ -88,11 +88,11 @@ func TestSecurity(t *testing.T) {
 		assert.Len(t, g.(*group).security, 2)
 		assert.Len(t, g.(*group).security[0], 1)
 		assert.Equal(t, g.(*group).security[0], map[string][]string{
-			"JWT": []string{},
+			"JWT": {},
 		})
 		assert.Len(t, g.(*group).security[1], 1)
 		assert.Equal(t, g.(*group).security[1], map[string][]string{
-			"Basic": []string{},
+			"Basic": {},
 		})
 	})
 
@@ -102,20 +102,20 @@ func TestSecurity(t *testing.T) {
 		a := g.GET("/oauth2", h)
 
 		s := map[string][]string{
-			"OAuth2": []string{"write:users", "read:users"},
+			"OAuth2": {"write:users", "read:users"},
 		}
 		a.SetSecurityWithScope(s)
 		assert.Len(t, a.(*api).security, 1)
 		assert.Len(t, a.(*api).security[0], 1)
 		assert.Equal(t, a.(*api).security[0], map[string][]string{
-			"OAuth2": []string{"write:users", "read:users"},
+			"OAuth2": {"write:users", "read:users"},
 		})
 
 		g.SetSecurityWithScope(s)
 		assert.Len(t, g.(*group).security, 1)
 		assert.Len(t, g.(*group).security[0], 1)
 		assert.Equal(t, g.(*group).security[0], map[string][]string{
-			"OAuth2": []string{"write:users", "read:users"},
+			"OAuth2": {"write:users", "read:users"},
 		})
 	})
 
@@ -129,13 +129,13 @@ func TestSecurity(t *testing.T) {
 		assert.Len(t, a.(*api).security, 0)
 
 		s2 := map[string][]string{
-			"OAuth2": []string{},
+			"OAuth2": {},
 		}
 		g.SetSecurityWithScope(s2)
 		assert.Len(t, g.(*group).security, 1)
 		assert.Len(t, g.(*group).security[0], 1)
 		assert.Equal(t, g.(*group).security[0], map[string][]string{
-			"OAuth2": []string{},
+			"OAuth2": {},
 		})
 	})
 
@@ -160,7 +160,7 @@ func TestSecurity(t *testing.T) {
 			assert.Len(t, o.(*Path).Get.Security, 1)
 			assert.Len(t, o.(*Path).Get.Security[0], 1)
 			assert.Equal(t, o.(*Path).Get.Security[0], map[string][]string{
-				"JWT": []string{},
+				"JWT": {},
 			})
 		}
 	})
@@ -210,13 +210,13 @@ func TestSecurityRepeat(t *testing.T) {
 		a := r.GET("/repeat", h)
 
 		sa := map[string][]string{
-			"OAuth2": []string{"write:users", "read:users"},
+			"OAuth2": {"write:users", "read:users"},
 		}
 		sb := map[string][]string{
-			"OAuth2": []string{"write:users"},
+			"OAuth2": {"write:users"},
 		}
 		sc := map[string][]string{
-			"OAuth2": []string{"write:spots"},
+			"OAuth2": {"write:spots"},
 		}
 		a.SetSecurityWithScope(sa)
 		a.SetSecurityWithScope(sb)

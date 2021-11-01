@@ -14,7 +14,7 @@ func (c PetController) Init(g echoswagger.ApiGroup) {
 		SetExternalDocs("Find out more", "http://swagger.io")
 
 	security := map[string][]string{
-		"petstore_auth": []string{"write:pets", "read:pets"},
+		"petstore_auth": {"write:pets", "read:pets"},
 	}
 
 	type Category struct {
@@ -70,7 +70,7 @@ func (c PetController) Init(g echoswagger.ApiGroup) {
 		AddResponse(http.StatusBadRequest, "Invalid tag value", nil, nil).
 		SetOperationId("findPetsByTags").
 		SetDeprecated().
-		SetDescription("Muliple tags can be provided with comma separated strings. Use         tag1, tag2, tag3 for testing.").
+		SetDescription("Multiple tags can be provided with comma separated strings. Use         tag1, tag2, tag3 for testing.").
 		SetSummary("Finds Pets by tags").
 		SetSecurityWithScope(security)
 

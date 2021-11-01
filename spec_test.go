@@ -11,8 +11,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var handleWithFilter func(handlerFunc echo.HandlerFunc, c echo.Context) error
-
 func TestSpec(t *testing.T) {
 	t.Run("Basic", func(t *testing.T) {
 		r := prepareApiRoot()
