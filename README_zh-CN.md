@@ -3,8 +3,9 @@
 # Echoswagger
 [Echo](https://github.com/labstack/echo) 框架的 [Swagger UI](https://github.com/swagger-api/swagger-ui) 生成器
 
+[![Ci](https://github.com/elvinchan/gobeeq/actions/workflows/ci.yml/badge.svg)](https://github.com/elvinchan/gobeeq/actions/workflows/ci.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/pangpanglabs/echoswagger)](https://goreportcard.com/report/github.com/pangpanglabs/echoswagger)
-[![Build Status](https://travis-ci.org/pangpanglabs/echoswagger.svg?branch=master)](https://travis-ci.org/pangpanglabs/echoswagger)
+[![Go Reference](https://pkg.go.dev/badge/github.com/pangpanglabs/echoswagger.svg)](https://pkg.go.dev/github.com/pangpanglabs/echoswagger)
 [![codecov](https://codecov.io/gh/pangpanglabs/echoswagger/branch/master/graph/badge.svg)](https://codecov.io/gh/pangpanglabs/echoswagger)
 
 ## 特性
