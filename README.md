@@ -3,7 +3,7 @@ English | [简体中文](./README_zh-CN.md)
 # Echoswagger
 [Swagger UI](https://github.com/swagger-api/swagger-ui) generator for [Echo](https://github.com/labstack/echo) framework
 
-[![Ci](https://github.com/elvinchan/gobeeq/actions/workflows/ci.yml/badge.svg)](https://github.com/elvinchan/gobeeq/actions/workflows/ci.yml)
+[![Ci](https://github.com/pangpanglabs/echoswagger/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/pangpanglabs/echoswagger/actions/workflows/ci.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/pangpanglabs/echoswagger)](https://goreportcard.com/report/github.com/pangpanglabs/echoswagger)
 [![Go Reference](https://pkg.go.dev/badge/github.com/pangpanglabs/echoswagger.svg)](https://pkg.go.dev/github.com/pangpanglabs/echoswagger)
 [![codecov](https://codecov.io/gh/pangpanglabs/echoswagger/branch/master/graph/badge.svg)](https://codecov.io/gh/pangpanglabs/echoswagger)
@@ -22,7 +22,7 @@ go get github.com/pangpanglabs/echoswagger
 ## Go modules support
 If your project has migrated to Go modules, you can:
 - Choose v2 version of Echoswagger for Echo version v4.
-- Choose v1 version of Echoswagger for Echo version <= v3 .
+- Choose v1 version of Echoswagger for Echo version <= v3.
 
 To use v2 version, just do:
 - `go get github.com/pangpanglabs/echoswagger/v2`
@@ -232,6 +232,19 @@ required | `boolean` | Determines whether this parameter is mandatory. If the pa
 readOnly | `boolean` | Relevant only for Schema `"properties"` definitions. Declares the property as "read only". This means that it MAY be sent as part of a response but MUST NOT be sent as part of the request. Properties marked as `readOnly` being `true` SHOULD NOT be in the `required` list of the defined schema. Default value is `false`.
 enum | [*] | Enumerate value, multiple values should be separated by "\|"
 default | * | Default value, which type is same as the field's type.
+
+#### If you want to disable Echoswagger in some situation, please use `NewNop` method. It would neither create router nor generate any doc.
+e.g.
+```go
+e := echo.New()
+var se echoswagger.ApiRoot
+if os.Getenv("env") == "production" {
+    // Disable SwaggerEcho in production enviroment
+	se = echoswagger.NewNop(e)
+} else {
+	se = echoswagger.New(e, "doc/", nil)
+}
+```
 
 ## Reference
 [OpenAPI Specification 2.0](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md)
