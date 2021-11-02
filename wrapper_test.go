@@ -383,7 +383,7 @@ func TestUI(t *testing.T) {
 		if assert.NoError(t, h(c)) {
 			assert.Equal(t, http.StatusOK, rec.Code)
 			assert.Contains(t, rec.Body.String(), cdn)
-			assert.Contains(t, rec.Body.String(), `{\x22swagger\x22:`)
+			assert.NotContains(t, rec.Body.String(), `var specStr = ""`)
 			assert.Contains(t, rec.Body.String(), "#swagger-ui>.swagger-container>.topbar")
 		}
 
@@ -393,7 +393,7 @@ func TestUI(t *testing.T) {
 
 		if assert.NoError(t, h(c)) {
 			assert.Equal(t, http.StatusOK, rec.Code)
-			assert.NotContains(t, rec.Body.String(), "{\x22swagger\x22:")
+			assert.Contains(t, rec.Body.String(), `var specStr = ""`)
 			assert.Contains(t, rec.Body.String(), "#swagger-ui>.swagger-container>.topbar")
 		}
 	})

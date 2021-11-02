@@ -64,7 +64,9 @@ func (r *Root) docHandler(docPath string) echo.HandlerFunc {
 		} else {
 			params["hideTop"] = r.ui.HideTop
 		}
-		t.Execute(buf, params)
+		if err := t.Execute(buf, params); err != nil {
+			return c.String(http.StatusInternalServerError, err.Error())
+		}
 		return c.HTMLBlob(http.StatusOK, buf.Bytes())
 	}
 }

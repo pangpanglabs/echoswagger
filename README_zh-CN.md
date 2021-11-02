@@ -3,9 +3,10 @@
 # Echoswagger
 [Echo](https://github.com/labstack/echo) 框架的 [Swagger UI](https://github.com/swagger-api/swagger-ui) 生成器
 
+[![Ci](https://github.com/pangpanglabs/echoswagger/actions/workflows/ci.yml/badge.svg?branch=v2)](https://github.com/pangpanglabs/echoswagger/actions/workflows/ci.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/pangpanglabs/echoswagger)](https://goreportcard.com/report/github.com/pangpanglabs/echoswagger)
-[![Build Status](https://travis-ci.org/pangpanglabs/echoswagger.svg?branch=v2)](https://travis-ci.org/pangpanglabs/echoswagger)
-[![codecov](https://codecov.io/gh/pangpanglabs/echoswagger/branch/v2/graph/badge.svg)](https://codecov.io/gh/pangpanglabs/echoswagger)
+[![Go Reference](https://pkg.go.dev/badge/github.com/pangpanglabs/echoswagger.svg)](https://pkg.go.dev/github.com/pangpanglabs/echoswagger)
+[![codecov](https://codecov.io/gh/pangpanglabs/echoswagger/branch/v2/graph/badge.svg)](https://codecov.io/gh/pangpanglabs/echoswagger/branch/v2)
 
 ## 特性
 - 不依赖任何SwaggerUI的HTML/CSS文件
@@ -231,6 +232,19 @@ required | `boolean` | 确定此参数是否必需。如果参数是`in`“path�
 readOnly | `boolean` | 仅与Schema`"properties"`定义相关。将属性声明为“只读”。这意味着它可以作为响应的一部分发送，但绝不能作为请求的一部分发送。标记为“readOnly”的属性为“true”，不应位于已定义模式的“required”列表中。默认值为“false”。
 enum | [*] | 枚举值，多个值应以“\|”分隔。
 default | * | 默认值，该类型与字段的类型相同。
+
+#### 如果需要在某些情况下禁用Echoswagger，请使用`NewNop`方法。这样既不会生成路由也不会生成文档
+e.g.
+```go
+e := echo.New()
+var se echoswagger.ApiRoot
+if os.Getenv("env") == "production" {
+    // Disable SwaggerEcho in production enviroment
+	se = echoswagger.NewNop(e)
+} else {
+	se = echoswagger.New(e, "doc/", nil)
+}
+```
 
 ## 参考
 [OpenAPI Specification 2.0](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md)
