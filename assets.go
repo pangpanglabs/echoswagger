@@ -1,7 +1,7 @@
 package echoswagger
 
-// CDN refer to https://www.jsdelivr.com/package/npm/swagger-ui-dist
-const DefaultCDN = "https://cdn.jsdelivr.net/npm/swagger-ui-dist@3.52.5"
+// CDN refer to https://cdnjs.com/libraries/swagger-ui
+const DefaultCDN = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.11.1"
 
 const SwaggerUIContent = `{{define "swagger"}}
 <!DOCTYPE html>
